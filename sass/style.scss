@@ -10,9 +10,14 @@ $font-family-base: 'Raleway', sans-serif;
 body {
 	word-wrap: break-word !important;
 	white-space: normal !important;
-	background-color: #0099cc;
+	background-color: #5CD6FF;
+	color: black;
 }
 
+
+hr {
+	border-top: 1px solid black !important;
+}
 
 .preview_col {
   padding: 5px;
@@ -52,32 +57,6 @@ body {
 	}
 }
 
-.small_space_top {
-	margin-top: 10px;
-}
-.medium_space_top {
-	margin-top: 15px;
-}
-.big_space_top {
-	margin-top: 20px;
-}
-
-.my_hide {
-	display: none;
-}
-
-.no_margin_top {
-	margin-top: 0px !important;
-}
-
-.full_width {
-	width: 100%;
-}
-
-.left_right_margin {
-	margin-left: 5px;
-	margin-right: 5px;
-}
 
 .btn {
 	white-space: normal !important;
@@ -90,46 +69,6 @@ body {
 	}
 }
 
-// managed bidding
-
-.white_box {
-	background-color: white;
-	padding: 10px;
-	border: 1px solid grey;
-	display: inline-block;
-
-	.title {
-		margin: 5px;
-		font-weight: bold;
-		text-align: left;
-	}
-}
-
-.drawing_board {
-	border-radius: 10px;
-	border: 4px dashed grey;
-	background-color: white;
-	width: 100%;
-	min-height: 300px;
-}
-.drawing_board.active {
-	background-color: $brand-primary;
-}
-
-// charter
-.chart {
-	background-color: white;
-}
-
-// wiki
-
-#editZone {
-	height: 100%;
-}
-
-.sidebar_note {
-
-}
 
 // autobidding
 .csvTableMenu {
@@ -159,65 +98,4 @@ body {
 		background-color: lightblue;
 	}
 
-}
-
-// reporting
-
-.request_table, .request_history_table {
-	width: 100%;
-	margin: 20px 0;
-	text-align: center;
-	border-collapse: separate;
-	border-spacing: 5px;
-
-	th {
-		min-width: 20px;
-		text-align: center;
-		background-color: white;
-		cursor: pointer;
-	}
-	th:hover {
-		outline: 2px solid black;
-	}
-	td, th {
-		padding: 10px;
-	}
-	td {
-		background-color: lightgrey;
-	}
-	td:hover {
-		background-color: lightblue;
-	}
-}
-.request_table {
-	.add_td {
-		cursor: pointer;
-	}
-	.buttonTd {
-		.deleteButton:hover {
-			background-color: $brand-danger !important;
-		}	
-	}
-	.add_td:hover {
-		background-color: $brand-success;
-	}
-}
-
-.request_history_table {
-	// color based on status
-	td.successful {
-		background-color: $brand-success;		
-	}
-	td.failed {
-		background-color: $brand-danger;
-	}
-	td.processing {
-		background-color: $brand-primary;
-	}
-	td.pending {
-		background-color: lightgrey;
-	}
-	td.cancelled {
-		background-color: $brand-warning;		
-	}
 }
