@@ -1,1 +1,55 @@
+# want jsx only except for a few js files
+*.js
+!js/components/helpers.js
+!js/components/config.js
+!js/components/auth.js
+!js/components/file_upload.js
+
+# Compiled Object files, Static and Dynamic libs (Shared Objects)
+*.o
+*.a
+*.so
+
+# Folders
+_obj
+_test
+
+# if jekyll used
+_site
+
+# typical node stuff
+dist/*.js
+dist/*.css
+.tmp
+.sass-cache
+bower_components
+.DS_Store
+*.log
 node_modules
+build
+*.node
+#components
+coverage
+*.orig
+.idea
+sandbox
+test/out-fixtures/*
+test/watch-*.txt
+gulp.1
+
+
+# Architecture specific extensions/prefixes
+*.[568vq]
+[568vq].out
+
+*.cgo1.go
+*.cgo2.c
+_cgo_defun.c
+_cgo_gotypes.go
+_cgo_export.*
+
+_testmain.go
+
+*.exe
+*.test
+*.prof

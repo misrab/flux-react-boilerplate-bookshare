@@ -1,184 +1,130 @@
-var gulp = require('gulp');
-var source = require('vinyl-source-stream'); // Used to stream bundle for further handling
-var browserify = require('browserify');
-var watchify = require('watchify');
-var babelify = require('babelify'); 
-var gulpif = require('gulp-if');
-var uglify = require('gulp-uglify');
-var streamify = require('gulp-streamify');
-var notify = require('gulp-notify');
-var concat = require('gulp-concat');
-var cssmin = require('gulp-cssmin');
-var gutil = require('gulp-util');
-var shell = require('gulp-shell');
-var glob = require('glob');
-var livereload = require('gulp-livereload');
-var jasminePhantomJs = require('gulp-jasmine2-phantomjs');
+var gulp = require('gulp'),     
+    sass = require('gulp-ruby-sass') 
+    notify = require("gulp-notify") 
+    bower = require('gulp-bower')
+    bowerRequireJS = require('bower-requirejs')
+    minifyCSS = require('gulp-minify-css')
+    uglify = require('gulp-uglify')
+    nodemon = require('gulp-nodemon')
+    react = require('gulp-react')
+    del = require('del')
+    concat = require('gulp-concat');
 
-// External dependencies you do not want to rebundle while developing,
-// but include in your application deployment
-var dependencies = [
-	'react',
-  'react/addons',
-  'flux-react'
-];
-
-var browserifyTask = function (options) {
-
-  // Our app bundler
-	var appBundler = browserify({
-		entries: [options.src], // Only need initial file, browserify finds the rest
-   	transform: [babelify], // We want to convert JSX to normal javascript
-		debug: options.development, // Gives us sourcemapping
-		cache: {}, packageCache: {}, fullPaths: options.development // Requirement of watchify
-	});
-
-	// We set our dependencies as externals on our app bundler when developing.
-  // You might consider doing this for production also and load two javascript
-  // files (main.js and vendors.js), as vendors.js will probably not change and
-  // takes full advantage of caching
-	appBundler.external(options.development ? dependencies : []);
+var config = {
+     sassPath: './sass',
+     bowerDir: './bower_components' 
+}
 
 
-  // The rebundle process
-  var rebundle = function () {
-    var start = Date.now();
-    console.log('Building APP bundle');
-    appBundler.bundle()
-      .on('error', gutil.log)
-      .pipe(source('main.js'))
-      .pipe(gulpif(!options.development, streamify(uglify())))
-      .pipe(gulp.dest(options.dest))
-      .pipe(gulpif(options.development, livereload()))
-      .pipe(notify(function () {
-        console.log('APP bundle built in ' + (Date.now() - start) + 'ms');
-      }));
-  };
+gulp.task('bower', function() { 
+    return bower()
+         .pipe(gulp.dest(config.bowerDir)) 
+});
 
-  // Fire up Watchify when developing
-  if (options.development) {
-    appBundler = watchify(appBundler);
-    appBundler.on('update', rebundle);
-  }
-      
-  rebundle();
+gulp.task('bower-requirejs', function(callback) {
+    var options = {
+        baseUrl: 'js/',
+        config: 'js/_config.js',
+        transitive: true
+    };
 
-  // We create a separate bundle for our dependencies as they
-  // should not rebundle on file changes. This only happens when
-  // we develop. When deploying the dependencies will be included 
-  // in the application bundle
-  if (options.development) {
-
-  	var testFiles = glob.sync('./specs/**/*-spec.js');
-		var testBundler = browserify({
-			entries: testFiles,
-			debug: true, // Gives us sourcemapping
-			transform: [babelify],
-			cache: {}, packageCache: {}, fullPaths: true // Requirement of watchify
-		});
-
-    testBundler.external(dependencies);
-
-  	var rebundleTests = function () {
-  		var start = Date.now();
-  		console.log('Building TEST bundle');
-  		testBundler.bundle()
-      .on('error', gutil.log)
-	      .pipe(source('specs.js'))
-	      .pipe(gulp.dest(options.dest))
-	      .pipe(livereload())
-	      .pipe(notify(function () {
-	        console.log('TEST bundle built in ' + (Date.now() - start) + 'ms');
-	      }));
-  	};
-
-    testBundler = watchify(testBundler);
-    testBundler.on('update', rebundleTests);
-    rebundleTests();
-
-    // Remove react-addons when deploying, as it is only for
-    // testing
-    if (!options.development) {
-      dependencies.splice(dependencies.indexOf('react/addons'), 1);
-    }
-
-    var vendorsBundler = browserify({
-      debug: true,
-      require: dependencies
+    bowerRequireJS(options, function (rjsConfigFromBower) {
+        callback();
     });
-    
-    // Run the vendor bundle
-    var start = new Date();
-    console.log('Building VENDORS bundle');
-    vendorsBundler.bundle()
-      .on('error', gutil.log)
-      .pipe(source('vendors.js'))
-      .pipe(gulpif(!options.development, streamify(uglify())))
-      .pipe(gulp.dest(options.dest))
-      .pipe(notify(function () {
-        console.log('VENDORS bundle built in ' + (Date.now() - start) + 'ms');
-      }));
-    
-  }
-  
-}
-
-var cssTask = function (options) {
-    if (options.development) {
-      var run = function () {
-        console.log(arguments);
-        var start = new Date();
-        console.log('Building CSS bundle');
-        gulp.src(options.src)
-          .pipe(concat('main.css'))
-          .pipe(gulp.dest(options.dest))
-          .pipe(notify(function () {
-            console.log('CSS bundle built in ' + (Date.now() - start) + 'ms');
-          }));
-      };
-      run();
-      gulp.watch(options.src, run);
-    } else {
-      gulp.src(options.src)
-        .pipe(concat('main.css'))
-        .pipe(cssmin())
-        .pipe(gulp.dest(options.dest));   
-    }
-}
-
-// Starts our development workflow
-gulp.task('default', function () {
-
-  browserifyTask({
-    development: true,
-    src: './app/main.js',
-    dest: './build'
-  });
-  
-  cssTask({
-    development: true,
-    src: './styles/**/*.css',
-    dest: './build'
-  });
-
 });
 
-gulp.task('deploy', function () {
 
-  browserifyTask({
-    development: false,
-    src: './app/main.js',
-    dest: './dist'
-  });
-  
-  cssTask({
-    development: false,
-    src: './styles/**/*.css',
-    dest: './dist'
-  });
-
+gulp.task('icons', function() { 
+    return gulp.src(config.bowerDir + '/fontawesome/fonts/**.*') 
+        .pipe(gulp.dest('./fonts')); 
 });
 
-gulp.task('test', function () {
-    return gulp.src('./build/testrunner-phantomjs.html').pipe(jasminePhantomJs());
+
+gulp.task('css', function() { 
+		return sass(config.sassPath + '/style.scss', { 
+				style: 'compressed',
+	             loadPath: [
+	                 './sass',
+	                 config.bowerDir + '/bootstrap-sass-official/assets/stylesheets',
+	                 config.bowerDir + '/fontawesome/scss',
+	             ]
+			})
+            .on("error", notify.onError(function (error) {
+                 return "Error: " + error.message;
+             }))
+             .pipe(gulp.dest('./css')); 
 });
+
+gulp.task('minify-css', function() {
+	// in order do .src(['./lib/file3.js', './lib/file1.js', './lib/file2.js'])
+  return gulp.src('./css/*.css')
+  	.pipe(concat('all.css'))
+    // .pipe(minifyCSS({keepBreaks:true})) // NOT IN DEV
+    .pipe(gulp.dest('./dist/'))
+});
+
+
+gulp.task('scripts', function() {
+  return gulp.src('./js/[^_]*.js')
+    .pipe(concat('_all.js'))
+    // .pipe(uglify())
+    .pipe(gulp.dest('./js/'));
+});
+
+gulp.task('clean', function(cb) {
+    del(['dist/*.js', 'dist/*.css', 'js/_all.js', 'js/[^_]*.js'], cb)
+});
+
+gulp.task('cleanJs', function(cb) {
+    del(['dist/*.js'], cb)
+});
+
+// scss err will stay forever otherwise
+gulp.task('cleanCss', function(cb) {
+    return cb();
+
+    del(['css/style.css'], function(err) {
+        cb(); // no error check
+    });
+});
+
+
+// convert jsx to js
+gulp.task('jsx', function () {
+    return gulp.src(['./js/*/*.jsx', './js/*.jsx'])
+        .pipe(react())
+        .pipe(gulp.dest('./js/'));
+});
+
+// Rerun the task when a file changes
+ gulp.task('watch', function() {
+     gulp.watch(config.sassPath + '/*.scss', ['cleanCss', 'css', 'minify-css']); 
+    gulp.watch('./js/**/*.+(js|jsx)', ['jsx', 'scripts']);
+});
+
+// gulp.task('run', function() {
+//     // console.log("running...");
+//     gulp.task('start', function () {
+//   nodemon({
+//     script: 'server.js'
+//   , ext: 'js html'
+//   , env: { 'NODE_ENV': 'development' }
+//   })
+// })
+// });
+
+gulp.task('run', function () {
+  nodemon({
+    script: 'server.js'
+  , ext: 'js html'
+  // , env: { 'NODE_ENV': 'development' }
+  })
+})
+
+
+// without watch
+gulp.task('build', ['clean', 'cleanCss', 'bower', 'bower-requirejs', 'icons', 'css', 'minify-css', 'jsx', 'scripts']);
+
+  gulp.task('default', ['clean', 'cleanCss', 'bower', 'bower-requirejs', 'icons', 'css', 'minify-css', 'jsx', 'scripts', 'watch', 'run']);
+
+

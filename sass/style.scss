@@ -1,0 +1,223 @@
+// (these are in .scss format)
+@import url(http://fonts.googleapis.com/css?family=Raleway:400,700,300);
+$font-family-base: 'Raleway', sans-serif;
+// Import bootstrap and fontawesome
+@import "bootstrap";
+@import "font-awesome";
+
+// generic
+
+body {
+	word-wrap: break-word !important;
+	white-space: normal !important;
+	background-color: #0099cc;
+}
+
+
+.preview_col {
+  padding: 5px;
+  margin: 5px;
+  border: 1px solid grey;
+  background-color: white;
+}
+
+.my_alert {
+	width: 500px;
+	position: fixed;
+	top: 10%;
+	left: 50%;
+	margin-left: -250px;
+	z-index: 9999;
+}
+
+.loader {
+	position: fixed;
+	width: 100%;
+	height: 100%;
+	background-color: white;
+	opacity: 0.7;
+	z-index: 9999;
+	text-align: center;
+	vertical-align:middle;
+	display: none;
+
+	img {
+		height: 200px;
+		width: 200px;
+		position: fixed;
+		top: 50%;
+		left: 50%;
+		margin-left: -100px;
+		margin-top: -100px;
+	}
+}
+
+.small_space_top {
+	margin-top: 10px;
+}
+.medium_space_top {
+	margin-top: 15px;
+}
+.big_space_top {
+	margin-top: 20px;
+}
+
+.my_hide {
+	display: none;
+}
+
+.no_margin_top {
+	margin-top: 0px !important;
+}
+
+.full_width {
+	width: 100%;
+}
+
+.left_right_margin {
+	margin-left: 5px;
+	margin-right: 5px;
+}
+
+.btn {
+	white-space: normal !important;
+}
+
+.btn-group {
+	.btn {
+		border-radius: 0 !important;
+		margin-top: 5px !important;
+	}
+}
+
+// managed bidding
+
+.white_box {
+	background-color: white;
+	padding: 10px;
+	border: 1px solid grey;
+	display: inline-block;
+
+	.title {
+		margin: 5px;
+		font-weight: bold;
+		text-align: left;
+	}
+}
+
+.drawing_board {
+	border-radius: 10px;
+	border: 4px dashed grey;
+	background-color: white;
+	width: 100%;
+	min-height: 300px;
+}
+.drawing_board.active {
+	background-color: $brand-primary;
+}
+
+// charter
+.chart {
+	background-color: white;
+}
+
+// wiki
+
+#editZone {
+	height: 100%;
+}
+
+.sidebar_note {
+
+}
+
+// autobidding
+.csvTableMenu {
+	width: 100%;
+	background-color: lightgrey;
+	padding: 10px;
+	border-radius: 4px;
+	margin: 10px 0;
+	text-align: center;
+}
+.csvTable {
+	width: 100%;
+	text-align: center;
+	border-collapse: separate;
+	border-spacing: 5px;
+
+	td, th {
+		padding: 10px;
+	}
+	td {
+		background-color: white;
+	}
+	th {
+		background-color: lightgrey;
+	}
+	td:hover {
+		background-color: lightblue;
+	}
+
+}
+
+// reporting
+
+.request_table, .request_history_table {
+	width: 100%;
+	margin: 20px 0;
+	text-align: center;
+	border-collapse: separate;
+	border-spacing: 5px;
+
+	th {
+		min-width: 20px;
+		text-align: center;
+		background-color: white;
+		cursor: pointer;
+	}
+	th:hover {
+		outline: 2px solid black;
+	}
+	td, th {
+		padding: 10px;
+	}
+	td {
+		background-color: lightgrey;
+	}
+	td:hover {
+		background-color: lightblue;
+	}
+}
+.request_table {
+	.add_td {
+		cursor: pointer;
+	}
+	.buttonTd {
+		.deleteButton:hover {
+			background-color: $brand-danger !important;
+		}	
+	}
+	.add_td:hover {
+		background-color: $brand-success;
+	}
+}
+
+.request_history_table {
+	// color based on status
+	td.successful {
+		background-color: $brand-success;		
+	}
+	td.failed {
+		background-color: $brand-danger;
+	}
+	td.processing {
+		background-color: $brand-primary;
+	}
+	td.pending {
+		background-color: lightgrey;
+	}
+	td.cancelled {
+		background-color: $brand-warning;		
+	}
+}
