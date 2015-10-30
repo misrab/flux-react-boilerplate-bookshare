@@ -153,6 +153,10 @@ function(
 						<button className="btn btn-default box" onClick={null}>
 							Logout
 						</button>
+
+						<a href="#/home" className="btn btn-default box">
+							Home (temp)
+						</a>
 					</div>
 
 					<RouteHandler />
@@ -202,14 +206,14 @@ function(
 		render: function() {
 			var that = this;
 
-			 setTimeout(function() {
-		     	// var lala =that.state.feedItems.slice();
-		     	// lala.unshift(22);
+			//  setTimeout(function() {
+		 //     	// var lala =that.state.feedItems.slice();
+		 //     	// lala.unshift(22);
 
-				that.setState({
-					feedItems: [22].concat(that.state.feedItems)
-				});
-			}, 5000); 
+			// 	that.setState({
+			// 		feedItems: [22].concat(that.state.feedItems)
+			// 	});
+			// }, 5000); 
 
 			return (
 				<div className="container">

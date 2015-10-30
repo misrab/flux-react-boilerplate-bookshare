@@ -17,6 +17,7 @@ function(Components, React, Router, $) {
     // <NotFoundRoute handler={Components.NotFound} />
     var routes = (
       <Route path="/" handler={Components.App}>
+        <Route name="home" path="home" handler={Components.Home} />
 
         
         <DefaultRoute handler={Components.Index} />
