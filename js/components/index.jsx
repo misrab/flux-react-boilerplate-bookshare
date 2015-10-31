@@ -15,7 +15,7 @@ function(React, Router, $,
 	
 
 	mergeObj(result, Basic);
-  mergeObj(result, Home);
+  	mergeObj(result, Home);
 
 
 	return result;

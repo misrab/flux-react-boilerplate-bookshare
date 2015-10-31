@@ -21,7 +21,8 @@ require.config({
     "css-transition-group": "../bower_components/css-transition-group/index",
     "flux-react": "../bower_components/flux-react/src/main",
     "react-dom": "../bower_components/react-dom/react-dom",
-    update: "../bower_components/update/index"
+    update: "../bower_components/update/index",
+    "jquery-autocomplete": "../bower_components/jquery-autocomplete/jquery.autocomplete"
   },
   packages: [
 
