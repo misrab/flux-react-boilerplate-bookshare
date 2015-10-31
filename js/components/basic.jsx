@@ -130,9 +130,7 @@ function(
 		// 	// this.setState({ loggedIn: false });
 		// 	// window.location.replace("/");
 		// },
-		resultFacebookLogin: function(response) {
-			console.log( response );
-		},
+		
 
 		render: function () {
 			var that = this;
@@ -143,21 +141,6 @@ function(
 						<img src="img/loader.gif" />
 					</div>
 
-					<div className="pull-right big_space_top">
-						<Facebook
-							appId="912474842172888"
-							class="facebook-login"
-							scope="public_profile, email, user_birthday"
-							loginHandler={ that.resultFacebookLogin } />
-
-						<button className="btn btn-default box" onClick={null}>
-							Logout
-						</button>
-
-						<a href="#/home" className="btn btn-default box">
-							Home (temp)
-						</a>
-					</div>
 
 					<RouteHandler />
 				</div>
@@ -231,12 +214,96 @@ function(
 		}
 	});
 
+	result.SidebarView = React.createClass({
+		  toggleMenu: function(e) {
+	          e.preventDefault();
+	          $('#sidebar-wrapper').toggleClass('active');
+	      },
 
+	      getInitialState: function() {
+					return {
+						// currentUser: null
+					};
+				},
+	      componentDidMount: function() {
+	      	// get current user
+	      	var that = this;
+
+
+	      	// check current user
+	      	// var tokenencoded = Auth.getToken();
+	      	// var tokendecoded = atob(tokenencoded);
+	      	// var email = tokendecoded.split(":")[0].replace("@tripadvisor.com", "");
+	      	// // get the user
+	      	// Auth.getCurrentUser(function(err, user) {
+	      	// 	if (err) return console.log(JSON.stringify(err));
+
+	      	// 	that.setState({
+	      	// 		currentUser: user
+	      	// 	});
+	      	// });
+	      	
+	 
+
+	      	
+	      	// handle 401
+			// 	$.ajax({
+			// 		type: 'GET',
+			// beforeSend: function(xhr) { xhr.setRequestHeader("Authorization", "Basic " + Auth.getToken()); },
+			// 		url: Config.ROOT_API_URL,
+			// 		error: function(httpObj, textStatus) {
+			// 			if (httpObj.status===401) {
+			// 				return Auth.logout();
+			// 				console.log("Invalid credentials, logging out...");
+			// 			}
+			// 		}
+			// 	});
+	      },
+
+	      render: function() {
+	      	var that = this;
+
+	      	// var wikiClick = function(e) {
+	      	// 	e.preventDefault();
+	      	// 	console.log("e");
+	      	// 	window.location.href = "/#/app/wiki";
+	      	// };
+
+	        return (
+	          <div className="container">
+	            <a onClick={this.toggleMenu} id="menu-toggle" href="#" className="btn btn-dark btn-lg toggle"><i className="fa fa-bars" /></a>
+	            <nav id="sidebar-wrapper">
+	              <ul className="sidebar-nav">
+	                <a onClick={this.toggleMenu} id="menu-close" href="#" className="btn btn-light btn-lg pull-right toggle"><i className="fa fa-times" /></a>
+	                <li className="sidebar-brand">
+	                  <a href="#top" onClick="">
+	                  </a>
+	                </li>
+	      
+	                <li>
+	                  <a href="#" className="sidebar_item" onClick={null}>
+	                    Logout
+	                  </a>
+	                </li>
+	              </ul>
+	            </nav>
+
+
+	            <RouteHandler/>
+	          </div>
+	        );
+	      }
+	    })
 
 	/*
 		Index
 	*/
 	result.Index = React.createClass({
+		resultFacebookLogin: function(response) {
+			console.log( response );
+		},
+
+
 		getInitialState: function() {
 			return {
 				// currentUser: null
@@ -258,6 +325,18 @@ function(
 							</h1>
 							<h3>You are what you read</h3>
 
+
+							
+							<div className="pull-right big_space_top">
+								<Facebook
+									appId="912474842172888"
+									class="facebook-login"
+									scope="public_profile, email, user_birthday"
+									loginHandler={ that.resultFacebookLogin } />
+								<a href="#/app/home" className="btn btn-default box">
+									Home (temp)
+								</a>
+							</div>
 
 						 </div> {/*  */}
 					</header>

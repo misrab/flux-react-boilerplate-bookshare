@@ -22,6 +22,11 @@
     "jquery-ui": "~1.11.4",
     "react": "~0.13.3",
     "react-bootstrap": "~0.24.2",
-    "react-router": "~0.13.3"
+    "react-router": "~0.13.3",
+    "flux-react": "~2.6.6",
+    "update": "*"
+  },
+  "resolutions": {
+    "react": "~0.13.3"
   }
 }

@@ -1,5 +1,5 @@
 
-require(['./components/index', 'react', 'react-router', 'jquery'], 
+require(['./components/index', 'react', 'react-router',  'jquery'], 
 function(Components, React, Router, $) {
     //This function is called when scripts/helper/util.js is loaded.
     //If util.js calls define(), then this function is not fired until
@@ -17,8 +17,10 @@ function(Components, React, Router, $) {
     // <NotFoundRoute handler={Components.NotFound} />
     var routes = (
       <Route path="/" handler={Components.App}>
-        <Route name="home" path="home" handler={Components.Home} />
 
+        <Route path="app/" handler={Components.SidebarView}>
+            <Route name="home" path="home" handler={Components.Home} />
+        </Route>
         
         <DefaultRoute handler={Components.Index} />
         <NotFoundRoute handler={Components.NotFound} />
@@ -55,6 +57,6 @@ function(Components, React, Router, $) {
     // <Route name="state" path="state/:abbr" handler={State}/>
 
     Router.run(routes, function (Handler) {
-      React.render(<Handler/>, document.body);
+      React.render(<Handler/>, document.getElementById('react_wrapper'));
     });
 });
