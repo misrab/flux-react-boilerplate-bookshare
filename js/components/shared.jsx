@@ -49,13 +49,14 @@ function(
 
 
 			return (
-				<input type="text" placeholder={that.props.placeholder} name={that.props.name} className="form-control text-center" />
+				<input type="text" placeholder={that.props.placeholder} name={that.props.name} className="form-control box" />
 			)
 		}
 	});
 
 
 	// parent should be relative
+	// handler takes (data, event)
 	result.Cancel = React.createClass({
 		render: function() {
 			var that = this;
@@ -68,7 +69,7 @@ function(
 			};
 
 			return (
-				<span onClick={that.props.handler} style={styler} className="fa fa-times">
+				<span onClick={that.props.handler.bind(null, that.props.data)} style={styler} className="fa fa-times">
 				</span>
 			)
 		}

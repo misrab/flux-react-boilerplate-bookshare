@@ -143,6 +143,48 @@ function(
 
 
 					<RouteHandler />
+
+
+					{/* Footer */}
+					<footer>
+						<div className="container">
+							<div className="row">
+								<div className="col-lg-12 text-center">
+									<hr />
+
+									<h4>
+										<strong>Words for Thought</strong>
+									</h4>
+									
+									{/*
+									<p>Singapore</p>
+									<ul className="list-unstyled">
+										<li>
+											<i className="fa fa-envelope-o fa-fw" />
+											<a href="mailto:name@example.com">faizullah.misrab@gmail.com</a>
+										</li>
+									</ul>
+									<br />
+									<ul className="list-inline">
+										<li>
+											<a href="#"><i className="fa fa-facebook fa-fw fa-3x" /></a>
+										</li>
+										<li>
+											<a href="#"><i className="fa fa-twitter fa-fw fa-3x" /></a>
+										</li>
+										<li>
+											<a href="#"><i className="fa fa-dribbble fa-fw fa-3x" /></a>
+										</li>
+									</ul>
+									*/}
+									<p className="text-muted">Copyright 2015</p>
+								</div>
+							</div>
+						</div>
+					</footer>
+
+
+
 				</div>
 			);
 		}
@@ -348,44 +390,6 @@ function(
 					<PublicFeed />
 
 
-
-
-
-					{/* Footer */}
-					<footer>
-						<div className="container">
-							<div className="row">
-								<div className="col-lg-10 col-lg-offset-1 text-center">
-									<hr />
-
-									<h4><strong>Words for Thought</strong>
-									</h4>
-									<p>Singapore</p>
-									{/*
-									<ul className="list-unstyled">
-										<li>
-											<i className="fa fa-envelope-o fa-fw" />
-											<a href="mailto:name@example.com">faizullah.misrab@gmail.com</a>
-										</li>
-									</ul>
-									<br />
-									<ul className="list-inline">
-										<li>
-											<a href="#"><i className="fa fa-facebook fa-fw fa-3x" /></a>
-										</li>
-										<li>
-											<a href="#"><i className="fa fa-twitter fa-fw fa-3x" /></a>
-										</li>
-										<li>
-											<a href="#"><i className="fa fa-dribbble fa-fw fa-3x" /></a>
-										</li>
-									</ul>
-									*/}
-									<p className="text-muted">Copyright 2015</p>
-								</div>
-							</div>
-						</div>
-					</footer>
 
 				</div>
 			);
