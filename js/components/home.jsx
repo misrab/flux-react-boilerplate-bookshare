@@ -1,7 +1,7 @@
 define([
 	// './auth', './config',
 	'./shared', '../helpers/helpers',
-	'react', 'jquery', 'jquery-ui'], 
+	'react', 'jquery', 'jquery-ui', 'bootstrap-linkpreview'], 
 function(
 	// Auth, Config,
 	Shared, Helpers,
@@ -9,6 +9,100 @@ function(
 
 	var result = {};
 
+
+	/*
+		Custom helpers
+	*/
+
+	var AutocompleteCustom = React.createClass({
+
+		// returns if string is a url
+		isUrl: function(s) {
+			var regexp = /(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/
+   			return regexp.test(s);
+		},
+
+		shouldComponentUpdate: function(nextProps) {
+		  return this.props.data !== nextProps.data;
+		},
+
+		componentDidMount: function() {
+			var that = this;
+
+			that.updateAutocomplete();
+
+
+			var el = $(React.findDOMNode(that));
+
+			// bind enter key
+			el.keydown(function(event){
+				if(event.keyCode == 13) {
+					var str = el.val();
+
+					// if empty or not a url, ignore
+					if(str.length==0 || !that.isUrl(str)) {
+						event.preventDefault();
+						return false;
+					}
+
+					// TODO if not url, try adding the book
+					// (and handle if not in database)
+
+					
+					// Get the link
+					that.props.handleLink(el);
+				}
+			});
+		},
+
+		componentWillUnmount: function() {
+			var el = $(React.findDOMNode(this));
+
+			el.autocomplete('destroy');
+			el.unbind('keydown');
+		},
+
+		componentDidUpdate: function() {
+		  this.updateAutocomplete();
+		},
+
+		updateAutocomplete: function() {
+		  var that = this;
+
+		  var data = that.props.data;
+		  var selectCallback = that.props.selectCallback;
+		  var sourceCallback = that.props.sourceCallback;
+
+		  if (!data) data = [];
+
+
+		  $(React.findDOMNode(this)).autocomplete({
+		  	source: sourceCallback,
+		  	select: function(e, ui) {
+		  		if (selectCallback) selectCallback(e, ui);
+		  	},
+		  	search: function(e, ui) {
+		  		console.log('searching');
+		  		var str = $(e.target).val();
+
+		  		// if it's a url try to load a 
+		  		// preview instead
+		  		if (that.isUrl(str)) {
+		  			e.preventDefault();
+		  		}
+		  	}
+		  });
+		},
+
+		render: function() {
+			var that = this;
+
+
+			return (
+				<input type="text" placeholder={that.props.placeholder} name={that.props.name} className="form-control box" />
+			)
+		}
+	});
 
 
 	/*
@@ -22,22 +116,48 @@ function(
 
 			var data = that.props.data;
 			if (!data) return null;
+			// <Shared.Cancel data={data} handler={that.props.deleteReading} />
 
 			return (
 				<div className="reading_summary">
-					<strong>{data.title}</strong>
+					<div className="overflow_container">
+						<strong>{data.title}</strong>
 
-					<Shared.Cancel data={data} handler={that.props.deleteReading} />
+						<Shared.Cancel data={data} handler={that.props.deleteReading} />
 
-					<object data={data.image_url} type="image/png">
-						<img src="img/logo_grey.png" />
-					</object>
-
+						<object data={data.image_url} type="image/png">
+							<img src="img/logo_grey.png" />
+						</object>
+					</div>
 
 				</div>
 			)
 		}
 	});
+
+
+	// var ArticleSummary = React.createClass({
+	// 	render: function() {
+	// 		var that = this;
+
+	// 		var data = that.props.data;
+	// 		if (!data) return null;
+
+	// 		return (
+	// 			<div className="reading_summary">
+	// 				<strong>{data.title}</strong>
+
+	// 				<Shared.Cancel data={data} handler={that.props.deleteReading} />
+
+	// 				<object data={data.image_url} type="image/png">
+	// 					<img src="img/logo_grey.png" />
+	// 				</object>
+
+
+	// 			</div>
+	// 		)
+	// 	}
+	// });
 
 
 	// Readings master
@@ -55,24 +175,24 @@ function(
 						<div className="row">
 							<div className="col-md-6">
 								<h3 className="text-muted">Books</h3>
-								<Shared.Autocomplete sourceCallback={that.props.getBookSuggestions} selectCallback={that.props.addReading} data={that.props.suggestions} placeholder="Book title" name="new_book_title" />
+								{/*<Shared.Autocomplete sourceCallback={that.props.getBookSuggestions} selectCallback={that.props.addReading} data={that.props.suggestions} placeholder="Book title" name="new_book_title" />*/}
 
 								{
-									that.props.myReadings.map(function(v, i) {
+									that.props.myReadings.length ? that.props.myReadings.map(function(v, i) {
 										return <ReadingSummary deleteReading={that.props.deleteReading} data={v} key={i} />
-									})
+									}) : "You don't have any books recorded. Try posting about one in your feed!"
 								}
 							</div>
 
 							<div className="col-md-6">
 								<h3 className="text-muted">Articles</h3>
 
-								<input type='text' placeholder='Url link' className='form-control box' />
-								{/*
-									that.props.myReadings.map(function(v, i) {
+								{/*<input type='text' placeholder='Url link' className='form-control box' />*/}
+								{
+									that.props.myArticles.length ? that.props.myArticles.map(function(v, i) {
 										return <ReadingSummary deleteReading={that.props.deleteReading} data={v} key={i} />
-									})
-								*/}
+									}) : "You don't have any articles recorded. Try posting about one in your feed!"
+								}
 							</div>
 						</div>						
 					</div>
@@ -91,6 +211,8 @@ function(
 	// Feed master
 	var Feed = React.createClass({
 		render: function() {
+			var that = this;
+
 			return (
 				<div className="my_panel">
 					<div className="white_box"></div>
@@ -101,17 +223,22 @@ function(
 						{/* status section */}
 						
 						<div className="row">
-							<div className="col-md-4">
-								<span className='force_text_left'>
-									<Shared.Autocomplete sourceCallback={null} selectCallback={null} data={[]} placeholder="Book title or article url" name="status_post_reading" />
-								</span>
-								<textarea
-									placeholder="Thoughts on a recent reading?"
-									className="form-control box small_space_top">
-								</textarea>
+							<div className="col-md-5">
+								<div className="panel box padded">
+									<span className='force_text_left'>
+										<AutocompleteCustom handleLink={that.props.handleLink} sourceCallback={that.props.getBookSuggestions} selectCallback={that.props.addReading} data={that.props.suggestions} placeholder="Book title or article url" name="status_post_reading" />
+										{/*<Shared.Autocomplete sourceCallback={null} selectCallback={null} data={[]} placeholder="Book title or article url" name="status_post_reading" />*/}
+									</span>
+									<textarea
+										style={{resize:'none', height: '150px'}}
+										placeholder="Thoughts on a recent reading?"
+										className="form-control box small_space_top">
+									</textarea>
+
+								</div>
 
 							</div>
-							<div className="col-md-8">
+							<div className="col-md-7">
 								
 							</div>
 						</div>
@@ -151,6 +278,8 @@ function(
 			e.preventDefault();
 			// var item = ui.item;
 
+			// TODO post it
+
 			// TEMP functions
 			function getRandomInt(min, max) {
 			  return Math.floor(Math.random() * (max - min)) + min;
@@ -165,8 +294,8 @@ function(
 
 			    return text;
 			}
-
 			var reading = {id: getRandomInt(1,1000), title: makeid(), image_url: 'http://theartmad.com/wp-content/uploads/2015/02/Cute-Monkeys-6.jpg'}; // item.value
+			// end TEMP
 
 			that.setState({
 				myReadings: that.state.myReadings.concat([reading])
@@ -176,8 +305,44 @@ function(
 			// clear the input
 			// console.log($(e.target).val());
 			$(e.target).val('');
-
 		},
+
+		// TODO this could potentially be merged with
+		// addReading
+		// addArticle: function(e, ui) {
+		// 	var that = this;
+
+		// 	e.preventDefault();
+		// 	// var item = ui.item;
+
+		// 	// TODO post it
+
+		// 	// TEMP functions
+		// 	function getRandomInt(min, max) {
+		// 	  return Math.floor(Math.random() * (max - min)) + min;
+		// 	}
+		// 	function makeid()
+		// 	{
+		// 	    var text = "";
+		// 	    var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+		// 	    for( var i=0; i < 5; i++ )
+		// 	        text += possible.charAt(Math.floor(Math.random() * possible.length));
+
+		// 	    return text;
+		// 	}
+		// 	var reading = {id: getRandomInt(1,1000), title: makeid(), image_url: 'http://theartmad.com/wp-content/uploads/2015/02/Cute-Monkeys-6.jpg'}; // item.value
+		// 	// end TEMP
+
+		// 	that.setState({
+		// 		myArticles: that.state.myArticles.concat([reading])
+		// 	});
+
+
+		// 	// clear the input
+		// 	// console.log($(e.target).val());
+		// 	$(e.target).val('');
+		// },
 
 		getBookSuggestions: function(req, res) {
 			var that = this;
@@ -189,10 +354,59 @@ function(
 			res(mappedSuggestions);
 		},
 
+		handleLink: function(el) {
+			var that = this;
+			var url = el.val();
+
+			console.log('handling ' + url);
+
+
+			// var metaDesc = $.get(str, function (data) {
+			// 	var MetaDescription = $(data).find('meta[name=description]').attr("content");
+			// 	var Img_Src = $(data).find('link[rel=image_src]').attr("href");
+			// 	console.log(MetaDescription);
+			// 	console.log(Img_Src);
+			// });
+			
+
+
+
+
+
+
+
+			// e.preventDefault();
+			// var item = ui.item;
+
+			// TODO post it
+
+			// TEMP functions
+			// function getRandomInt(min, max) {
+			//   return Math.floor(Math.random() * (max - min)) + min;
+			// }
+			// var reading = {id: getRandomInt(1,1000), title: str, image_url: 'http://theartmad.com/wp-content/uploads/2015/02/Cute-Monkeys-6.jpg'}; // item.value
+
+
+			// // console.log(reading); return;
+
+			// that.setState({
+			// 	myArticles: that.state.myArticles.concat([reading])
+			// });
+
+
+			// // clear the input
+			// el.val('');
+
+		},
+
 		getInitialState() {
 		    return {
 		        suggestions: [{id: 23, title:'aaaaa', image_url: 'imgggg'}],
-		        myReadings: [] 
+		        myReadings: [], // books
+		        myArticles: [],
+		        // a preview of say an article
+		        // with title etc
+		        readingPreview: { title:'ttttt', description: 'this is da thing', image_url: 'fdsfds' }
 		    };
 		},
 
@@ -213,10 +427,10 @@ function(
 
 
 							{/* body */}
-							<Feed />
+							<Feed getBookSuggestions={that.getBookSuggestions} addReading={that.addReading} handleLink={that.handleLink}  />
 
 
-							<Readings myReadings={that.state.myReadings} getBookSuggestions={that.getBookSuggestions} addReading={that.addReading} deleteReading={that.deleteReading} />
+							<Readings deleteReading={that.deleteReading} myReadings={that.state.myReadings} myArticles={that.state.myArticles} />
 							
 
 							

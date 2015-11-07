@@ -63,8 +63,8 @@ function(
 
 			var styler = {
 				position: 'absolute',
-				top: '5px',
-				right: '5px',
+				top: '2px',
+				right: '2px',
 				cursor: 'pointer'
 			};
 

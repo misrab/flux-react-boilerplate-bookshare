@@ -14,6 +14,12 @@
 }
 
 
+.overflow_container {
+	width: 100%;
+	height: 100%;
+	overflow: hidden;
+}
+
 .force_text_left {
 	text-align: left !important;
 }

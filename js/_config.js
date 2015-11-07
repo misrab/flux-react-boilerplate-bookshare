@@ -22,7 +22,8 @@ require.config({
     "flux-react": "../bower_components/flux-react/src/main",
     "react-dom": "../bower_components/react-dom/react-dom",
     update: "../bower_components/update/index",
-    "jquery-autocomplete": "../bower_components/jquery-autocomplete/jquery.autocomplete"
+    "jquery-autocomplete": "../bower_components/jquery-autocomplete/jquery.autocomplete",
+    "bootstrap-linkpreview": "../bower_components/bootstrap-linkpreview/library/js/bootstrap-linkpreview"
   },
   packages: [
 
