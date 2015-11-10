@@ -25,7 +25,9 @@
     "react-router": "~0.13.3",
     "update": "*",
     "jquery-autocomplete": "~1.1.1",
-    "bootstrap-linkpreview": "*"
+    "bootstrap-linkpreview": "*",
+    "moment": "~2.10.6",
+    "jQuery.dotdotdot": "dotdotdot#~1.7.4"
   },
   "resolutions": {
     "jquery": "~2.1.4"

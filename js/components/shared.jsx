@@ -1,11 +1,91 @@
 define([
 	// './auth', './config',
-	'react', 'jquery'], 
+	'react', 'jquery', 'moment'], 
 function(
 	// Auth, Config,
-	React, $) {
+	React, $, moment) {
 
 	var result = {};
+
+
+	var FeedItem = React.createClass({
+		// componentDidMount() {
+		//       var desc = $(React.findDOMNode(this)).find('.description');
+		//       // console.log(desc.text());
+		//       desc.dotdotdot();
+		// },
+
+
+		render: function() {
+			var that = this;
+			var data = that.props.data;
+			if (!data) return null;
+
+
+			// first limit number of words, then number of characters
+			var description = data.description;
+			if (
+				data.description.length > 200
+				|| data.description.split(" ").length > 50
+				) {
+				description = data.description.split(" ").slice(0, 50).join(" ").slice(0, 200) 
+					+ "..."; // TODO maybe Read More
+			}
+
+
+			return (
+				<div className="feed_item">
+					{/* user and meta */}
+					<div style={{backgroundColor: 'lightgrey', padding: '5px', margin: '5px 0'}}>
+						<strong>{data.user.username}</strong> { moment(data.updatedAt).calendar().toLowerCase() }
+					</div>
+
+					{/* reading summary */}
+					<div className="reading_summary" style={{display:'inline-block', margin: '0'}}>
+						<div className="overflow_container">
+							<strong>{data.reading.title}</strong>
+							<object data={data.reading.image_url} type="image/png">
+								<img src="img/logo_grey.png" />
+							</object>
+						</div>
+					</div>
+
+					<div className="" style={{width: '65%', display:'inline-block', verticalAlign: 'top', marginLeft:'10px', fontSize: '1.25em'}}>
+						{/* actual post */}
+						<div className="description">
+							{ description }
+						</div>
+					</div>
+
+
+
+				</div>
+			)
+		}
+
+	});
+	// result.FeedItem = FeedItem;
+
+
+	result.PostViewer = React.createClass({
+		render: function() {
+			var that = this;
+			var data = that.props.data;
+
+			if (!data || !data.length) return <div>"No posts to show"</div>;
+
+			return (
+				<div>
+					{
+						data.map(function(v, i) {
+							return <FeedItem data={v} key={i} />;
+						})
+					}
+				</div>
+			)
+		}
+
+	});
 
 
 	result.Autocomplete = React.createClass({

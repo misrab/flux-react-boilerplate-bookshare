@@ -35,7 +35,7 @@ function(
 			var el = $(React.findDOMNode(that));
 
 			// bind enter key
-			el.keydown(function(event){
+			el.bind('keydown', function(event){
 				if(event.keyCode == 13) {
 					var str = el.val();
 
@@ -50,6 +50,7 @@ function(
 
 					
 					// Get the link
+					// TODO also add after "handling" i.e. getting meta
 					that.props.handleLink(el);
 				}
 			});
@@ -83,12 +84,14 @@ function(
 		  	},
 		  	search: function(e, ui) {
 		  		console.log('searching');
-		  		var str = $(e.target).val();
+		  		var el = $(e.target);
+		  		var str = el.val();
 
 		  		// if it's a url try to load a 
 		  		// preview instead
 		  		if (that.isUrl(str)) {
 		  			e.preventDefault();
+		  			that.props.handleLink(el);
 		  		}
 		  	}
 		  });
@@ -230,8 +233,9 @@ function(
 										{/*<Shared.Autocomplete sourceCallback={null} selectCallback={null} data={[]} placeholder="Book title or article url" name="status_post_reading" />*/}
 									</span>
 									<textarea
+										id="post_description"
 										style={{resize:'none', height: '150px'}}
-										placeholder="Thoughts on a recent reading?"
+										placeholder="Thoughts on your recent reading?"
 										className="form-control box small_space_top">
 									</textarea>
 
@@ -239,7 +243,7 @@ function(
 
 							</div>
 							<div className="col-md-7">
-								
+								<Shared.PostViewer data={that.props.posts} />
 							</div>
 						</div>
 						
@@ -278,7 +282,8 @@ function(
 			e.preventDefault();
 			// var item = ui.item;
 
-			// TODO post it
+			// var el = $(e.target);
+
 
 			// TEMP functions
 			function getRandomInt(min, max) {
@@ -297,6 +302,25 @@ function(
 			var reading = {id: getRandomInt(1,1000), title: makeid(), image_url: 'http://theartmad.com/wp-content/uploads/2015/02/Cute-Monkeys-6.jpg'}; // item.value
 			// end TEMP
 
+
+			// TODO post it
+
+
+
+			// add post to feed
+			// get description
+			var description = $('#post_description').val() || "Was just reading";
+			// console.log(description);
+			reading['description'] = description;
+
+			that.setState({
+				posts: that.state.posts.concat([reading])
+			});
+
+
+
+
+			// TODO only add if not in readings
 			that.setState({
 				myReadings: that.state.myReadings.concat([reading])
 			});
@@ -404,6 +428,20 @@ function(
 		        suggestions: [{id: 23, title:'aaaaa', image_url: 'imgggg'}],
 		        myReadings: [], // books
 		        myArticles: [],
+		        posts: [
+	        		{
+	        			id: 32,
+	        			
+	        			reading: {id: 23, title:'aaaaa', image_url: 'imgggg'},
+	        			user: { username: "Bob the builder" },
+
+	        			description: 'lalalalfklds;f;dsfsdkfldskfld;skgfladgkjfdlgjdfklgjkfdljgksfdlgjfdskgjfdsl;gjkfdljgdfksjg;sdfjgkfdljgkdfsjgdf;jgfdkjgk;dfsjgkfdl;bjnfkblnfsdb;fmsbkfs;f;dsfsdkfldskfld;skgfladgkjfdlgjdfklgjkfdljgksfdlgjfdskgjfdsl;gjkfdljgdfksjg;sdfjgkfdljgkdfsjgdf;jgfdkjgk;dfsjgkfdl;bjnfkblnfsdb;fmsbkfs;f;dsfsdkfldskfld;skgfladgkjfdlgjdfklgjkfdljgksfdlgjfdskgjfdsl;gjkfdljgdfksjg;sdfjgkfdljgkdfsjgdf;jgfdkjgk;dfsjgkfdl;bjnfkblnfsdb;fmsbkfs;f;dsfsdkfldskfld;skgfladgkjfdlgjdfklgjkfdljgksfdlgjfdskgjfdsl;gjkfdljgdfksjg;sdfjgkfdljgkdfsjgdf;jgfdkjgk;dfsjgkfdl;bjnfkblnfsdb;fmsbkfs;f;dsfsdkfldskfld;skgfladgkjfdlgjdfklgjkfdljgksfdlgjfdskgjfdsl;gjkfdljgdfksjg;sdfjgkfdljgkdfsjgdf;jgfdkjgk;dfsjgkfdl;bjnfkblnfsdb;fmsbkfs;f;dsfsdkfldskfld;skgfladgkjfdlgjdfklgjkfdljgksfdlgjfdskgjfdsl;gjkfdljgdfksjg;sdfjgkfdljgkdfsjgdf;jgfdkjgk;dfsjgkfdl;bjnfkblnfsdb;fmsbkfs;f;dsfsdkfldskfld;skgfladgkjfdlgjdfklgjkfdljgksfdlgjfdskgjfdsl;gjkfdljgdfksjg;sdfjgkfdljgkdfsjgdf;jgfdkjgk;dfsjgkfdl;bjnfkblnfsdb;fmsbkfs;laa',
+
+
+
+	        			updatedAt: new Date()
+	        		}
+		        ], // TODO get initial and listen over websocket
 		        // a preview of say an article
 		        // with title etc
 		        readingPreview: { title:'ttttt', description: 'this is da thing', image_url: 'fdsfds' }
@@ -427,7 +465,7 @@ function(
 
 
 							{/* body */}
-							<Feed getBookSuggestions={that.getBookSuggestions} addReading={that.addReading} handleLink={that.handleLink}  />
+							<Feed posts={that.state.posts} getBookSuggestions={that.getBookSuggestions} addReading={that.addReading} handleLink={that.handleLink}  />
 
 
 							<Readings deleteReading={that.deleteReading} myReadings={that.state.myReadings} myArticles={that.state.myArticles} />

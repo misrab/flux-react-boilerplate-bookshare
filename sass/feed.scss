@@ -1,13 +1,14 @@
 
 .feed_item {
 	width: 100%;
-	height: 50px;
+	min-height: 150px;
 	background-color: white;
 	outline: 1px solid black;
 	padding: 10px;
-	margin: 10px 0;
-	display: none;
+	margin-bottom: 10px;
+	/*display: none;*/
 }
+
 
 /*
 	/app/home
