@@ -137,9 +137,11 @@ function(
 
 	// parent should be relative
 	// handler takes (data, event)
-	result.Cancel = React.createClass({
+	var Cancel = React.createClass({
 		render: function() {
 			var that = this;
+
+			if (!that.props.handler) return null;
 
 			var styler = {
 				position: 'absolute',
@@ -154,6 +156,135 @@ function(
 			)
 		}
 	});
+	result.Cancel = Cancel;
+
+
+	/*
+		Readings
+	*/
+
+
+	var ReadingSummary = React.createClass({
+		
+		render: function() {
+			var that = this;
+
+			var data = that.props.data;
+			if (!data) return null;
+			// <Shared.Cancel data={data} handler={that.props.deleteReading} />
+
+			return (
+				<div className="reading_summary">
+					<div className="overflow_container">
+						<strong>{data.title}</strong>
+
+						<Cancel data={data} handler={that.props.deleteReading} />
+
+						<object data={data.image_url} type="image/png">
+							<img src="img/logo_grey.png" />
+						</object>
+					</div>
+
+				</div>
+			)
+		}
+	});
+	result.ReadingSummary = ReadingSummary;
+
+
+	// Readings master
+	var ReadingViewer = React.createClass({
+		render: function() {
+			var that = this;
+
+			return (
+				<div className="my_panel">
+					<div className="white_box"></div>
+
+					<div className="padded">
+						<h2>My Readings</h2>
+
+						<div className="row">
+							<div className="col-md-6">
+								<h3 className="text-muted">Books</h3>
+								{/*<Shared.Autocomplete sourceCallback={that.props.getBookSuggestions} selectCallback={that.props.addReading} data={that.props.suggestions} placeholder="Book title" name="new_book_title" />*/}
+
+								{
+									that.props.myReadings.length ? that.props.myReadings.map(function(v, i) {
+										return <ReadingSummary deleteReading={that.props.deleteReading} data={v} key={i} />
+									}) : "You don't have any books recorded. Try posting about one in your feed!"
+								}
+							</div>
+
+							<div className="col-md-6">
+								<h3 className="text-muted">Articles</h3>
+
+								{/*<input type='text' placeholder='Url link' className='form-control box' />*/}
+								{
+									that.props.myArticles.length ? that.props.myArticles.map(function(v, i) {
+										return <ReadingSummary deleteReading={that.props.deleteReading} data={v} key={i} />
+									}) : "You don't have any articles recorded. Try posting about one in your feed!"
+								}
+							</div>
+						</div>						
+					</div>
+				</div>
+			)
+		}
+	});
+	result.ReadingViewer = ReadingViewer;
+
+
+	result.Readings = React.createClass({
+		deleteReading: function(reading, e) {
+			var that = this;
+
+			e.preventDefault();
+
+			// console.log(that.state.myReadings);
+
+			// TODO confirmation modal
+
+			// TODO actually delete
+
+			// then remove from state
+			Helpers.removeFromState(that, 'myReadings', 'id', reading.id);
+		},
+
+		getInitialState() {
+		    return {
+		        myReadings: [], // books
+		        myArticles: []
+		    };
+		},
+
+
+		render: function() {
+			var that = this;
+
+			return (
+				<div className="container">
+					<div className="row">
+						<div className="col-md-12 big_space_top">
+							<a href="#">
+								<img style={{height: 50}} src="/img/logo.png" />
+							</a>
+
+							<a className="btn btn-default box pull-right" href="#/app/home">
+								Feed
+							</a>
+
+							{/* body */}
+							<ReadingViewer deleteReading={that.deleteReading} myReadings={that.state.myReadings} myArticles={that.state.myArticles} />
+							
+
+						</div>
+					</div>
+				</div>
+			)
+		}
+	});
+
 
 
 

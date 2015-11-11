@@ -22,7 +22,8 @@ require.config({
     update: "../bower_components/update/index",
     "jquery-autocomplete": "../bower_components/jquery-autocomplete/jquery.autocomplete",
     "bootstrap-linkpreview": "../bower_components/bootstrap-linkpreview/library/js/bootstrap-linkpreview",
-    moment: "../bower_components/moment/moment"
+    moment: "../bower_components/moment/moment",
+    "jQuery.dotdotdot": "../bower_components/jQuery.dotdotdot/src/js/jquery.dotdotdot"
   },
   packages: [
 

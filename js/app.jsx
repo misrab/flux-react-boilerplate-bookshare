@@ -20,6 +20,8 @@ function(Components, React, Router, $) {
 
         <Route path="app/" handler={Components.SidebarView}>
             <Route name="home" path="home" handler={Components.Home} />
+
+            <Route name="readings" path="readings" handler={Components.Readings} />
         </Route>
         
         <DefaultRoute handler={Components.Index} />

@@ -35,32 +35,32 @@ function(
 			var el = $(React.findDOMNode(that));
 
 			// bind enter key
-			el.bind('keydown', function(event){
-				if(event.keyCode == 13) {
-					var str = el.val();
+			// el.bind('keydown', function(event){
+			// 	if(event.keyCode == 13) {
+			// 		var str = el.val();
 
-					// if empty or not a url, ignore
-					if(str.length==0 || !that.isUrl(str)) {
-						event.preventDefault();
-						return false;
-					}
+			// 		// if empty or not a url, ignore
+			// 		if(str.length==0 || !that.isUrl(str)) {
+			// 			event.preventDefault();
+			// 			return false;
+			// 		}
 
-					// TODO if not url, try adding the book
-					// (and handle if not in database)
+			// 		// TODO if not url, try adding the book
+			// 		// (and handle if not in database)
 
 					
-					// Get the link
-					// TODO also add after "handling" i.e. getting meta
-					that.props.handleLink(el);
-				}
-			});
+			// 		// Get the link
+			// 		// TODO also add after "handling" i.e. getting meta
+			// 		that.props.handleLink(el);
+			// 	}
+			// });
 		},
 
 		componentWillUnmount: function() {
 			var el = $(React.findDOMNode(this));
 
 			el.autocomplete('destroy');
-			el.unbind('keydown');
+			// el.unbind('keydown');
 		},
 
 		componentDidUpdate: function() {
@@ -108,35 +108,7 @@ function(
 	});
 
 
-	/*
-		Readings
-	*/
-
-	var ReadingSummary = React.createClass({
-		
-		render: function() {
-			var that = this;
-
-			var data = that.props.data;
-			if (!data) return null;
-			// <Shared.Cancel data={data} handler={that.props.deleteReading} />
-
-			return (
-				<div className="reading_summary">
-					<div className="overflow_container">
-						<strong>{data.title}</strong>
-
-						<Shared.Cancel data={data} handler={that.props.deleteReading} />
-
-						<object data={data.image_url} type="image/png">
-							<img src="img/logo_grey.png" />
-						</object>
-					</div>
-
-				</div>
-			)
-		}
-	});
+	
 
 
 	// var ArticleSummary = React.createClass({
@@ -163,46 +135,7 @@ function(
 	// });
 
 
-	// Readings master
-	var Readings = React.createClass({
-		render: function() {
-			var that = this;
-
-			return (
-				<div className="my_panel">
-					<div className="white_box"></div>
-
-					<div className="padded">
-						<h2>My Readings</h2>
-
-						<div className="row">
-							<div className="col-md-6">
-								<h3 className="text-muted">Books</h3>
-								{/*<Shared.Autocomplete sourceCallback={that.props.getBookSuggestions} selectCallback={that.props.addReading} data={that.props.suggestions} placeholder="Book title" name="new_book_title" />*/}
-
-								{
-									that.props.myReadings.length ? that.props.myReadings.map(function(v, i) {
-										return <ReadingSummary deleteReading={that.props.deleteReading} data={v} key={i} />
-									}) : "You don't have any books recorded. Try posting about one in your feed!"
-								}
-							</div>
-
-							<div className="col-md-6">
-								<h3 className="text-muted">Articles</h3>
-
-								{/*<input type='text' placeholder='Url link' className='form-control box' />*/}
-								{
-									that.props.myArticles.length ? that.props.myArticles.map(function(v, i) {
-										return <ReadingSummary deleteReading={that.props.deleteReading} data={v} key={i} />
-									}) : "You don't have any articles recorded. Try posting about one in your feed!"
-								}
-							</div>
-						</div>						
-					</div>
-				</div>
-			)
-		}
-	});
+	
 
 	/*
 		Feed
@@ -213,6 +146,21 @@ function(
 
 	// Feed master
 	var Feed = React.createClass({
+		componentDidMount: function() {
+			var that = this;
+
+	        // bind enter key
+			// $(window).bind('keydown', function(event){
+			// 	if (event.keyCode == 13) {
+			// 		console.log('enter');
+			// 	}
+			// });
+		},
+
+		componentWillUnmount: function() {
+			// $(window).unbind('keydown');
+		},
+
 		render: function() {
 			var that = this;
 
@@ -228,8 +176,12 @@ function(
 						<div className="row">
 							<div className="col-md-5">
 								<div className="panel box padded">
+									{/* preview */}
+									<Shared.ReadingSummary data={that.props.previewReading} />
+
+
 									<span className='force_text_left'>
-										<AutocompleteCustom handleLink={that.props.handleLink} sourceCallback={that.props.getBookSuggestions} selectCallback={that.props.addReading} data={that.props.suggestions} placeholder="Book title or article url" name="status_post_reading" />
+										<AutocompleteCustom handleLink={that.props.handleLink} sourceCallback={that.props.getBookSuggestions} selectCallback={that.props.selectBook} data={that.props.suggestions} placeholder="Book title or article url" name="status_post_reading" />
 										{/*<Shared.Autocomplete sourceCallback={null} selectCallback={null} data={[]} placeholder="Book title or article url" name="status_post_reading" />*/}
 									</span>
 									<textarea
@@ -238,6 +190,12 @@ function(
 										placeholder="Thoughts on your recent reading?"
 										className="form-control box small_space_top">
 									</textarea>
+
+
+
+									<div id="postButton" onClick={that.props.addReading} className="btn btn-success box full_width small_space_top">
+										Post
+									</div>
 
 								</div>
 
@@ -276,15 +234,11 @@ function(
 			Helpers.removeFromState(that, 'myReadings', 'id', reading.id);
 		},
 
-		addReading: function(e, ui) {
+		selectBook: function(e, ui) {
 			var that = this;
-
 			e.preventDefault();
-			// var item = ui.item;
 
-			// var el = $(e.target);
-
-
+			// TEMP
 			// TEMP functions
 			function getRandomInt(min, max) {
 			  return Math.floor(Math.random() * (max - min)) + min;
@@ -299,7 +253,29 @@ function(
 
 			    return text;
 			}
-			var reading = {id: getRandomInt(1,1000), title: makeid(), image_url: 'http://theartmad.com/wp-content/uploads/2015/02/Cute-Monkeys-6.jpg'}; // item.value
+			var reading = { id: getRandomInt(1,1000), title: makeid(), image_url: 'http://theartmad.com/wp-content/uploads/2015/02/Cute-Monkeys-6.jpg'};
+
+
+			// TODO
+			that.setState({
+				previewReading: reading
+			});
+
+			console.log('selectBook');
+		},
+
+		addReading: function(e) {
+			var that = this;
+
+			e.preventDefault();
+			// var item = ui.item;
+
+			// var el = $(e.target);
+
+
+			
+			
+			var reading = that.state.previewReading;
 			// end TEMP
 
 
@@ -311,12 +287,19 @@ function(
 			// get description
 			var description = $('#post_description').val() || "Was just reading";
 			// console.log(description);
-			reading['description'] = description;
+			// reading['description'] = description;
+
+			// console.log(reading);
+
+
+			var post = {};
+			post.description = description;
+			post.reading = reading;
+			post.user = { username: 'box da builder' };
 
 			that.setState({
-				posts: that.state.posts.concat([reading])
+				posts: that.state.posts.concat([post])
 			});
-
 
 
 
@@ -326,47 +309,10 @@ function(
 			});
 
 
-			// clear the input
-			// console.log($(e.target).val());
-			$(e.target).val('');
+			// TODO clear the inputs on success
+			// also clear the previewReading
 		},
 
-		// TODO this could potentially be merged with
-		// addReading
-		// addArticle: function(e, ui) {
-		// 	var that = this;
-
-		// 	e.preventDefault();
-		// 	// var item = ui.item;
-
-		// 	// TODO post it
-
-		// 	// TEMP functions
-		// 	function getRandomInt(min, max) {
-		// 	  return Math.floor(Math.random() * (max - min)) + min;
-		// 	}
-		// 	function makeid()
-		// 	{
-		// 	    var text = "";
-		// 	    var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-
-		// 	    for( var i=0; i < 5; i++ )
-		// 	        text += possible.charAt(Math.floor(Math.random() * possible.length));
-
-		// 	    return text;
-		// 	}
-		// 	var reading = {id: getRandomInt(1,1000), title: makeid(), image_url: 'http://theartmad.com/wp-content/uploads/2015/02/Cute-Monkeys-6.jpg'}; // item.value
-		// 	// end TEMP
-
-		// 	that.setState({
-		// 		myArticles: that.state.myArticles.concat([reading])
-		// 	});
-
-
-		// 	// clear the input
-		// 	// console.log($(e.target).val());
-		// 	$(e.target).val('');
-		// },
 
 		getBookSuggestions: function(req, res) {
 			var that = this;
@@ -385,6 +331,20 @@ function(
 			console.log('handling ' + url);
 
 
+			// assume this is coming as a post for now
+
+
+			// 1. get title, image (for now)
+
+
+			// 2. create the "reading"
+
+			// 3. POST the reading
+
+			// 4. add the post
+
+
+
 			// var metaDesc = $.get(str, function (data) {
 			// 	var MetaDescription = $(data).find('meta[name=description]').attr("content");
 			// 	var Img_Src = $(data).find('link[rel=image_src]').attr("href");
@@ -392,13 +352,6 @@ function(
 			// 	console.log(Img_Src);
 			// });
 			
-
-
-
-
-
-
-
 			// e.preventDefault();
 			// var item = ui.item;
 
@@ -423,7 +376,7 @@ function(
 
 		},
 
-		getInitialState() {
+		getInitialState: function() {
 		    return {
 		        suggestions: [{id: 23, title:'aaaaa', image_url: 'imgggg'}],
 		        myReadings: [], // books
@@ -448,6 +401,16 @@ function(
 		    };
 		},
 
+		/*
+			React lifecycle
+		*/
+
+
+
+		componentDidMount: function() {
+		      // get books and articles
+		},
+
 
 		render: function() {
 			var that = this;
@@ -462,13 +425,15 @@ function(
 								<img style={{height: 50}} src="/img/logo.png" />
 							</a>
 
-
+							<a className="btn btn-default box pull-right" href="#/app/readings">
+								My readings
+							</a>
 
 							{/* body */}
-							<Feed posts={that.state.posts} getBookSuggestions={that.getBookSuggestions} addReading={that.addReading} handleLink={that.handleLink}  />
+							<Feed previewReading={that.state.previewReading} posts={that.state.posts} getBookSuggestions={that.getBookSuggestions} addReading={that.addReading} selectBook={that.selectBook} handleLink={that.handleLink}  />
 
 
-							<Readings deleteReading={that.deleteReading} myReadings={that.state.myReadings} myArticles={that.state.myArticles} />
+							<Shared.ReadingViewer deleteReading={that.deleteReading} myReadings={that.state.myReadings} myArticles={that.state.myArticles} />
 							
 
 							

@@ -11,6 +11,27 @@ function(
 	var RouteHandler = Router.RouteHandler;
 
 
+
+	result.NotFound = React.createClass({
+		render: function() {
+		  return (
+			<center>
+			  <h1>
+			  	Page not found!
+			  </h1>
+
+			  <div>
+			  	<a className="btn btn-default" href="/">Home</a>
+			  </div>
+
+			  <img className="big_space_top" src="/img/notfound.png" />
+			</center>
+		  )
+		}
+	});
+
+
+
 	var Facebook = React.createClass({
 		render: function() {
 		  return (
@@ -321,12 +342,27 @@ function(
 	                  <a href="#top" onClick="">
 	                  </a>
 	                </li>
-	      
+
+	                <li>
+	                  <a href="#/app/home" className="sidebar_item" onClick={null}>
+	                    Home
+	                  </a>
+	                </li>
+
+	                <li>
+	                  <a href="#/app/readings" className="sidebar_item" onClick={null}>
+	                    My Readings
+	                  </a>
+	                </li>
+
+
 	                <li>
 	                  <a href="#" className="sidebar_item" onClick={null}>
 	                    Logout
 	                  </a>
 	                </li>
+
+	                
 	              </ul>
 	            </nav>
 
