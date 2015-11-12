@@ -1,9 +1,9 @@
 
 define([
-	// './auth', './config',
+	'../helpers/auth', '../helpers/config', '../helpers/helpers',
 	'react', 'react-router', 'jquery'], 
 function(
-	// Auth, Config,
+	Auth, Config, Helpers,
 	React, Router, $) {
 
 	var result = {};
@@ -118,12 +118,23 @@ function(
 	result.App = React.createClass({
 		getInitialState: function () {
 			return {
+				currentUser: null
 				// loggedIn: Auth.loggedIn()
 			};
 		},
 
+
 		componentDidMount: function() {
+			var that = this;
+
+			Auth.getCurrentUser(function(err, result) {
+				if (err) return console.log('Error getting current user: ' + JSON.stringify(err));
+				that.setState({
+					currentUser: result
+				});
+			});
 		},
+
 
 		// loginHandler: function(data) {
 		// 	var that = this;
@@ -144,13 +155,69 @@ function(
 
 		// },
 
-		// logoutHandler: function() {
-		// 	// console.log(data);
+		 // posts user creds to appropriate route
+      // expects #userForm
+      loginHelper: function(url, cb) {
+      	// get user data
+      	var form = $('#userForm');
+      	var data = {};
+      	data.email = form.find('input[name="email"]').val();
+      	data.password = form.find('input[name="password"]').val();
 
-		// 	// auto login for now
-		// 	// this.setState({ loggedIn: false });
-		// 	// window.location.replace("/");
-		// },
+      	if (!data.email || !data.password) {
+      		return Helpers.showAlert('Please provide an email and password', 'danger');
+      	}
+
+      	// console.log(data); return;
+
+      	$.ajax({
+		    url: url, 
+		    type: 'POST',
+		    contentType: 'application/json', 
+		    data: JSON.stringify(data),
+		    // beforeSend: function(xhr) { xhr.setRequestHeader("Authorization", "Basic " + Auth.getToken()); },
+		    success: function(result) {
+		    	console.log('success: ' + result);
+		    	if (cb) cb(null, result);
+		    	
+		    	// Helpers.showAlert('Force run worked', 'success');
+		    },
+		    error: function() {
+		    	console.log('error...');
+		    	if (cb) cb(new Error("Error authenticating user"), null);
+		    	
+		    	// Helpers.showAlert('Forced run failed', 'danger');
+		    }
+		  });
+      },
+
+      signup: function(e) {
+      	var that = this;
+      	e.preventDefault();
+      	console.log('heyyy');
+      	that.loginHelper(Config.API_URL + '/user', function(err, user) {
+      	
+      	});
+      },
+
+
+      login: function(e) {
+      	var that = this;
+      	e.preventDefault();
+      	console.log('heyyy');
+      	that.loginHelper(Config.API_URL + '/login', function(err, user) {
+
+      	});
+      },
+
+		logout: function() {
+			console.log('logout');
+			// console.log(data);
+
+			// auto login for now
+			// this.setState({ loggedIn: false });
+			// window.location.replace("/");
+		},
 		
 
 		render: function () {
@@ -163,7 +230,7 @@ function(
 					</div>
 
 
-					<RouteHandler />
+					<RouteHandler login={that.login} logout={that.logout} signup={that.signup} />
 
 
 					{/* Footer */}
@@ -176,28 +243,7 @@ function(
 									<h4>
 										<strong>Words for Thought</strong>
 									</h4>
-									
-									{/*
-									<p>Singapore</p>
-									<ul className="list-unstyled">
-										<li>
-											<i className="fa fa-envelope-o fa-fw" />
-											<a href="mailto:name@example.com">faizullah.misrab@gmail.com</a>
-										</li>
-									</ul>
-									<br />
-									<ul className="list-inline">
-										<li>
-											<a href="#"><i className="fa fa-facebook fa-fw fa-3x" /></a>
-										</li>
-										<li>
-											<a href="#"><i className="fa fa-twitter fa-fw fa-3x" /></a>
-										</li>
-										<li>
-											<a href="#"><i className="fa fa-dribbble fa-fw fa-3x" /></a>
-										</li>
-									</ul>
-									*/}
+					
 									<p className="text-muted">Copyright 2015</p>
 								</div>
 							</div>
@@ -362,7 +408,7 @@ function(
 	                  </a>
 	                </li>
 
-	                
+
 	              </ul>
 	            </nav>
 
@@ -411,8 +457,13 @@ function(
 									class="facebook-login"
 									scope="public_profile, email, user_birthday"
 									loginHandler={ that.resultFacebookLogin } />
+									
 								<a href="#/app/home" className="btn btn-default box">
 									Home (temp)
+								</a>
+
+								<a href="#/login" className="btn btn-default box">
+									Login / Signup
 								</a>
 							</div>
 
@@ -431,6 +482,86 @@ function(
 			);
 		}
 	});
+
+
+
+	/*
+		Login and Signup
+	*/
+
+	var Login = React.createClass({
+      getInitialState: function () {
+        return {};
+      },
+
+
+      // handle enter key
+      // handleKeyDown: function(e) {
+      // 	var ENTER = 13;
+      //   if( e.keyCode == ENTER ) {
+      //       $('#loginButton').click();
+      //   }
+      // },
+      componentDidMount: function() {
+      		var that = this;
+          // $(document.body).on('keydown', that.handleKeyDown);
+      },
+
+      componentWillUnMount: function() {
+      		var that = this;
+          // $(document.body).off('keydown', that.handleKeyDown);
+      },
+
+      render: function () {
+      	var that = this;
+
+
+        return (
+        	<div className="container">
+
+					{/* Header */}
+					<header id="top" className="header">
+						<div className="text-center">
+							<h1 className="big_space_top">
+								<img style={{height: 50}} src="/img/logo.png" />
+								Words for Thought
+							</h1>
+							<h3>You are what you read</h3>
+
+
+						
+
+						 </div> {/*  */}
+					</header>
+
+
+
+
+					{/* Body */}
+					<div id="userForm" style={{width: '40%', margin: '10px auto'}} >
+          				<input type="text" name="email" placeholder="Email" className="small_space_top form-control" />
+          				<input type="password" name="password" placeholder="Password" className="small_space_top form-control" />
+          				
+
+          				<a style={{width:'33.3%'}} href="/" className="box small_space_top btn btn-default">Back</a>
+          				<button style={{width:'33.3%'}} id="loginButton" onClick={that.props.login} className="box small_space_top btn btn-primary">Login</button>
+          				<button  style={{width:'33.3%'}} onClick={that.props.signup} className="box small_space_top btn btn-success">Signup</button>
+
+
+
+          				<div className="my_hide alert alert-danger small_space_top text-center">
+          					Invalid email or password
+          				</div>
+          			</div>
+
+
+				</div>
+
+        );
+      }
+    });
+	result.Login = Login;
+
 
 
 	return result;

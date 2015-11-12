@@ -3,6 +3,21 @@ define([
 ], function() {
 	var result = {};
 
+	result.showAlert = function(msg, type) {
+		var str = '.alert-' + type;
+		var el = $(str);
+
+		el.html(msg);
+
+		el.slideDown();
+		setTimeout(function() {
+			el.slideUp();
+		}, 5000);
+
+		// scroll to top
+		// document.body.scrollTop = document.documentElement.scrollTop = 0;
+	};
+
 
 	// modelName e.g. 'users', 'todoItems'
 	result.removeFromState = function(that, modelName, fieldName, fieldValue) {

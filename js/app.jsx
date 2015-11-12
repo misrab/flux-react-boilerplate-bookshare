@@ -18,6 +18,9 @@ function(Components, React, Router, $) {
     var routes = (
       <Route path="/" handler={Components.App}>
 
+
+        <Route name="login" path="login" handler={Components.Login} />
+
         <Route path="app/" handler={Components.SidebarView}>
             <Route name="home" path="home" handler={Components.Home} />
 
