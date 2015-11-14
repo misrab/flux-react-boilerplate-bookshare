@@ -29,9 +29,13 @@ define(['./config'], function(Config) {
 			  url: url,
 			  contentType: 'application/json', 
 			  success: function(result) {
+			  	// console.log(atob(localStorage.token));
 			  	cb(null, result);
 			  },
-			  error: cb
+			  error: function(err) {
+			  	console.log('error: ' + JSON.stringify(err));
+			  	cb(err);
+			  }
 			});
 
 	  	cb(null, null);
@@ -42,36 +46,37 @@ define(['./config'], function(Config) {
 	  	return localStorage.token;
 	  },
 
-	  login: function(data, cb) {
-	  	var url = Config.API_URL + "/user/login";
-	  	$.ajax({
-		  type: "POST",
-		  url: url,
-		  contentType: 'application/json', 
-	      data: JSON.stringify(data),
-		  success: function(result) {
-		  	localStorage.token = btoa(result.email + ":" + result.password);
-		  	cb();
-		  },
-		  error: cb
-		});
-	  	// localStorage.token = "token";
-	  	// if (cb) cb();
-	  },
+	 //  login: function(data, cb) {
+	 //  	var url = Config.API_URL + "/user/login";
+	 //  	$.ajax({
+		//   type: "POST",
+		//   url: url,
+		//   contentType: 'application/json', 
+	 //      data: JSON.stringify(data),
+		//   success: function(result) {
+		//   	// console.log(result); return;
 
-	  logout: function (e) {
-	  	if (e) e.preventDefault();
-	    delete localStorage.token;
-	    // console.log("Logout out...");
-	    window.location.replace("/");
-	    // if (cb) cb();
-	    // this.onChange(false);
-	  },
+		//   	localStorage.token = btoa(result.email + ":" + result.password);
+		//   	cb();
+		//   },
+		//   error: cb
+		// });
+	 //  	// localStorage.token = "token";
+	 //  	// if (cb) cb();
+	 //  },
+
+	 //  logout: function (e) {
+	 //  	if (e) e.preventDefault();
+	 //    delete localStorage.token;
+	 //    // console.log("Logout out...");
+	 //    window.location.replace("/");
+	 //    // if (cb) cb();
+	 //    // this.onChange(false);
+	 //  },
 	  
-	  loggedIn: function () {
-	    return !!localStorage.token;
-	  },
+	  // loggedIn: function () {
+	  //   return !!localStorage.token;
+	  // },
 
-	  onChange: function () {}
 	};
 });

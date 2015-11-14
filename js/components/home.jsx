@@ -1,9 +1,9 @@
 define([
-	// './auth', './config',
+	'../helpers/auth', '../helpers/config',
 	'./shared', '../helpers/helpers',
 	'react', 'jquery', 'jquery-ui', 'bootstrap-linkpreview'], 
 function(
-	// Auth, Config,
+	Auth, Config,
 	Shared, Helpers,
 	React, $, jqueryUI) {
 
@@ -70,11 +70,11 @@ function(
 		updateAutocomplete: function() {
 		  var that = this;
 
-		  var data = that.props.data;
+		  // var data = that.props.data;
 		  var selectCallback = that.props.selectCallback;
 		  var sourceCallback = that.props.sourceCallback;
 
-		  if (!data) data = [];
+		  // if (!data) data = [];
 
 
 		  $(React.findDOMNode(this)).autocomplete({
@@ -317,11 +317,34 @@ function(
 		getBookSuggestions: function(req, res) {
 			var that = this;
 
-			var mappedSuggestions = that.state.suggestions.map(function(v, i) {
-				return { label: v.title, value: v.title };
+
+	  		var url = Config.API_URL + "/readings_autocomplete?title=" + req.term;
+
+	  		// console.log(url);
+
+	  		$.ajax({
+			  type: "GET",
+		    beforeSend: function(xhr) { xhr.setRequestHeader("Authorization", "Basic " + Auth.getToken()); },
+			  url: url,
+			  contentType: 'application/json', 
+			  success: function(result) {
+			  	// console.log(result);
+
+			  	var mappedSuggestions = result.map(function(v, i) {
+					return { label: v.title, value: v.title };
+				});
+			  	res(mappedSuggestions);
+			  },
+			  error: function(err) {
+			  	console.log('error: ' + JSON.stringify(err));
+			  }
 			});
 
-			res(mappedSuggestions);
+			// var mappedSuggestions = that.state.suggestions.map(function(v, i) {
+			// 	return { label: v.title, value: v.title };
+			// });
+
+			// res(mappedSuggestions);
 		},
 
 		handleLink: function(el) {
@@ -421,7 +444,7 @@ function(
 				<div className="container">
 					<div className="row">
 						<div className="col-md-12 big_space_top">
-							<a href="#">
+							<a href="#/app/home">
 								<img style={{height: 50}} src="/img/logo.png" />
 							</a>
 

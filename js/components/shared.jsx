@@ -266,7 +266,7 @@ function(
 				<div className="container">
 					<div className="row">
 						<div className="col-md-12 big_space_top">
-							<a href="#">
+							<a href="#/app/home">
 								<img style={{height: 50}} src="/img/logo.png" />
 							</a>
 

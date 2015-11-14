@@ -129,6 +129,9 @@ function(
 
 			Auth.getCurrentUser(function(err, result) {
 				if (err) return console.log('Error getting current user: ' + JSON.stringify(err));
+					
+				// console.log(result);
+
 				that.setState({
 					currentUser: result
 				});
@@ -178,12 +181,19 @@ function(
 		    // beforeSend: function(xhr) { xhr.setRequestHeader("Authorization", "Basic " + Auth.getToken()); },
 		    success: function(result) {
 		    	console.log('success: ' + result);
+		    	if (!result) {
+		    		return cb(new Error("Invalid username or password"), null);
+		    	}
+
+
+		    	localStorage.token = btoa(result.email + ":" + result.hash);
+
 		    	if (cb) cb(null, result);
 		    	
 		    	// Helpers.showAlert('Force run worked', 'success');
 		    },
 		    error: function() {
-		    	console.log('error...');
+		    	// console.log('error...');
 		    	if (cb) cb(new Error("Error authenticating user"), null);
 		    	
 		    	// Helpers.showAlert('Forced run failed', 'danger');
@@ -194,9 +204,12 @@ function(
       signup: function(e) {
       	var that = this;
       	e.preventDefault();
-      	console.log('heyyy');
-      	that.loginHelper(Config.API_URL + '/user', function(err, user) {
-      	
+
+      	that.loginHelper(Config.API_URL + '/users', function(err, user) {
+      		if (err) return Helpers.showAlert("That email is already registered", 'danger');
+      		console.log(user);
+
+      		window.location.replace('#/app/home');
       	});
       },
 
@@ -204,19 +217,28 @@ function(
       login: function(e) {
       	var that = this;
       	e.preventDefault();
-      	console.log('heyyy');
-      	that.loginHelper(Config.API_URL + '/login', function(err, user) {
 
+      	that.loginHelper(Config.API_URL + '/login', function(err, user) {
+      		if (err) return Helpers.showAlert("Invalid username or password", 'danger');
+      		console.log(user);
+
+			window.location.replace('#/app/home');
       	});
       },
 
-		logout: function() {
+		logout: function(e) {
+			e.preventDefault();
 			console.log('logout');
-			// console.log(data);
 
+			delete localStorage.token;
+			// TODO set state, location
+
+
+			// console.log(data);
+			// Auth.logout();
 			// auto login for now
-			// this.setState({ loggedIn: false });
-			// window.location.replace("/");
+			this.setState({ currentUser: null });
+			window.location.replace("/");
 		},
 		
 
@@ -391,7 +413,7 @@ function(
 
 	                <li>
 	                  <a href="#/app/home" className="sidebar_item" onClick={null}>
-	                    Home
+	                    Feed
 	                  </a>
 	                </li>
 
@@ -403,7 +425,7 @@ function(
 
 
 	                <li>
-	                  <a href="#" className="sidebar_item" onClick={null}>
+	                  <a href="#" className="sidebar_item" onClick={that.props.logout}>
 	                    Logout
 	                  </a>
 	                </li>
