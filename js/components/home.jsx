@@ -240,21 +240,23 @@ function(
 
 			// TEMP
 			// TEMP functions
-			function getRandomInt(min, max) {
-			  return Math.floor(Math.random() * (max - min)) + min;
-			}
-			function makeid()
-			{
-			    var text = "";
-			    var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+			// function getRandomInt(min, max) {
+			//   return Math.floor(Math.random() * (max - min)) + min;
+			// }
+			// function makeid()
+			// {
+			//     var text = "";
+			//     var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 
-			    for( var i=0; i < 5; i++ )
-			        text += possible.charAt(Math.floor(Math.random() * possible.length));
+			//     for( var i=0; i < 5; i++ )
+			//         text += possible.charAt(Math.floor(Math.random() * possible.length));
 
-			    return text;
-			}
-			var reading = { id: getRandomInt(1,1000), title: makeid(), image_url: 'http://theartmad.com/wp-content/uploads/2015/02/Cute-Monkeys-6.jpg'};
+			//     return text;
+			// }
+			// var reading = { id: getRandomInt(1,1000), title: makeid(), image_url: 'http://theartmad.com/wp-content/uploads/2015/02/Cute-Monkeys-6.jpg'};
 
+			console.log(ui.item);
+			return;
 
 			// TODO
 			that.setState({
