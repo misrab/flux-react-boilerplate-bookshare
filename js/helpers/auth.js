@@ -1,4 +1,6 @@
-define(['./config'], function(Config) {
+define([
+	'./config', './helpers',
+], function(Config, Helpers) {
 	return {
 	  // login (email, pass, cb) {
 	  //   cb = arguments[arguments.length - 1];
@@ -23,22 +25,39 @@ define(['./config'], function(Config) {
 	  getCurrentUser: function(cb) {
 	  	var that = this;
 	  	var url = Config.API_URL + "/current_user";
-	  	$.ajax({
-			  type: "GET",
-		    beforeSend: function(xhr) { xhr.setRequestHeader("Authorization", "Basic " + that.getToken()); },
-			  url: url,
-			  contentType: 'application/json', 
-			  success: function(result) {
-			  	// console.log(atob(localStorage.token));
-			  	cb(null, result);
-			  },
-			  error: function(err) {
-			  	console.log('error: ' + JSON.stringify(err));
-			  	cb(err);
-			  }
-			});
 
-	  	cb(null, null);
+
+	  				  	// console.log(atob(localStorage.token));
+
+	  	Helpers.ajaxReq('GET', url, {}, cb);
+
+
+	  // 	$.ajax({
+			//   type: "GET",
+		 //    beforeSend: function(xhr) { xhr.setRequestHeader("Authorization", "Basic " + that.getToken()); },
+			//   url: url,
+			//   contentType: 'application/json', 
+			//   success: function(result) {
+			//   	// console.log(result);
+			//   	// if (!result) {
+			//   	// 	delete localStorage.token;
+			//   	// 	if (window.location.pathname!=="/") window.location.replace('/');
+			//   	// }
+
+			//   	cb(null, result);
+			//   },
+			//   error: function(err) {
+			//   	console.log('error: ' + JSON.stringify(err));
+
+			//   	// make sure logged out
+			//   	// delete localStorage.token;
+			//   	// if (window.location.pathname!=="/") window.location.replace('/');
+
+			//   	cb(err);
+			//   }
+			// });
+
+	  // 	cb(null, null);
 	  },
 
 

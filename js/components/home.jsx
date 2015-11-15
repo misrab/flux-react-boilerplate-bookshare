@@ -82,6 +82,11 @@ function(
 		  	select: function(e, ui) {
 		  		if (selectCallback) selectCallback(e, ui);
 		  	},
+		  	// get label instead of value
+		  	focus: function(e, ui) {
+		  		e.preventDefault();
+		  		$(e.target).val(ui.item.label);
+		  	},
 		  	search: function(e, ui) {
 		  		console.log('searching');
 		  		var el = $(e.target);
@@ -175,7 +180,7 @@ function(
 						
 						<div className="row">
 							<div className="col-md-5">
-								<div className="panel box padded">
+								<div id="new_post_panel" className="panel box padded">
 									{/* preview */}
 									<Shared.ReadingSummary data={that.props.previewReading} />
 
@@ -228,7 +233,15 @@ function(
 
 			// TODO confirmation modal
 
-			// TODO actually delete
+			// TODO actually delete association
+		  	var url = Config.API_URL + "/users_readings/" + reading.id;
+		  	// var data = { reading_id: reading.id || 0 };
+		  	console.log(url);
+		  	Helpers.ajaxReq('DELETE', url, {}, function(err, result) {
+		  		console.log(err);
+		  		// console.log(result);
+		  	});
+
 
 			// then remove from state
 			Helpers.removeFromState(that, 'myReadings', 'id', reading.id);
@@ -237,6 +250,12 @@ function(
 		selectBook: function(e, ui) {
 			var that = this;
 			e.preventDefault();
+
+			// set the input as the label, not value
+			$(e.target).val(ui.item.label);
+
+			// turn the value into json
+			var data = JSON.parse(ui.item.value);
 
 			// TEMP
 			// TEMP functions
@@ -255,15 +274,15 @@ function(
 			// }
 			// var reading = { id: getRandomInt(1,1000), title: makeid(), image_url: 'http://theartmad.com/wp-content/uploads/2015/02/Cute-Monkeys-6.jpg'};
 
-			console.log(ui.item);
-			return;
+			// console.log(data);
+			// return;
 
 			// TODO
 			that.setState({
-				previewReading: reading
+				previewReading: data
 			});
 
-			console.log('selectBook');
+			// console.log('selectBook');
 		},
 
 		addReading: function(e) {
@@ -280,39 +299,68 @@ function(
 			var reading = that.state.previewReading;
 			// end TEMP
 
+			// console.log(reading);
+			// console.log(that.state.currentUser);
+			// return;
 
-			// TODO post it
 
+			// post association
+			var that = this;
+		  	var url = Config.API_URL + "/users_readings";
+		  	var data = { reading_id: reading.id || 0 };
+		  	Helpers.ajaxReq('POST', url, data, function(err, result) {
+		  		console.log(err); // user could already be associated
+		  		// console.log(result);
+		  	});
+		  	// return;
 
 
 			// add post to feed
 			// get description
-			var description = $('#post_description').val() || "Was just reading";
-			// console.log(description);
-			// reading['description'] = description;
-
-			// console.log(reading);
-
-
+			// this is for the browser side
+			var comment = $('#post_description').val() || "Was just reading";
 			var post = {};
-			post.description = description;
+			post.comment = comment;
 			post.reading = reading;
-			post.user = { username: 'box da builder' };
-
+			post.user = that.state.currentUser;
 			that.setState({
 				posts: that.state.posts.concat([post])
 			});
 
+			// post actual post server side
+			var postData = {};
+			postData.comment = comment;
+			postData.user_id = that.state.currentUser.id;
+			postData.reading_id = reading.id;
+			console.log('posting post: ' + JSON.stringify(postData));
+			Helpers.ajaxReq('POST', Config.API_URL + "/posts", postData, function(err, result) {
+		  		console.log(err); // user could already be associated
+		  		console.log(result);
+		  	});
 
 
-			// TODO only add if not in readings
-			that.setState({
-				myReadings: that.state.myReadings.concat([reading])
-			});
+			// only add if not in readings
+			var found = false;
+			for (var i=0; i < that.state.myReadings.length; i++) {
+				if (reading.id === that.state.myReadings[i].id) {
+					found = true;
+					break;
+				}
+			}
+			if (!found) {
+				that.setState({
+					myReadings: that.state.myReadings.concat([reading])
+				});
+			}
 
 
 			// TODO clear the inputs on success
 			// also clear the previewReading
+			that.setState({
+				previewReading: null
+			});
+			$('#new_post_panel').find('input').val('');
+			$('#new_post_panel').find('textarea').val('');
 		},
 
 
@@ -326,14 +374,18 @@ function(
 
 	  		$.ajax({
 			  type: "GET",
-		    beforeSend: function(xhr) { xhr.setRequestHeader("Authorization", "Basic " + Auth.getToken()); },
+		      beforeSend: function(xhr) { xhr.setRequestHeader("Authorization", "Basic " + Auth.getToken()); },
 			  url: url,
 			  contentType: 'application/json', 
 			  success: function(result) {
 			  	// console.log(result);
 
+			  	if (!result) return res([]);
+
+
+
 			  	var mappedSuggestions = result.map(function(v, i) {
-					return { label: v.title, value: v.title };
+					return { label:  v.title, value: JSON.stringify(v) };
 				});
 			  	res(mappedSuggestions);
 			  },
@@ -401,39 +453,62 @@ function(
 
 		},
 
-		getInitialState: function() {
-		    return {
-		        suggestions: [{id: 23, title:'aaaaa', image_url: 'imgggg'}],
-		        myReadings: [], // books
-		        myArticles: [],
-		        posts: [
-	        		{
-	        			id: 32,
-	        			
-	        			reading: {id: 23, title:'aaaaa', image_url: 'imgggg'},
-	        			user: { username: "Bob the builder" },
-
-	        			description: 'lalalalfklds;f;dsfsdkfldskfld;skgfladgkjfdlgjdfklgjkfdljgksfdlgjfdskgjfdsl;gjkfdljgdfksjg;sdfjgkfdljgkdfsjgdf;jgfdkjgk;dfsjgkfdl;bjnfkblnfsdb;fmsbkfs;f;dsfsdkfldskfld;skgfladgkjfdlgjdfklgjkfdljgksfdlgjfdskgjfdsl;gjkfdljgdfksjg;sdfjgkfdljgkdfsjgdf;jgfdkjgk;dfsjgkfdl;bjnfkblnfsdb;fmsbkfs;f;dsfsdkfldskfld;skgfladgkjfdlgjdfklgjkfdljgksfdlgjfdskgjfdsl;gjkfdljgdfksjg;sdfjgkfdljgkdfsjgdf;jgfdkjgk;dfsjgkfdl;bjnfkblnfsdb;fmsbkfs;f;dsfsdkfldskfld;skgfladgkjfdlgjdfklgjkfdljgksfdlgjfdskgjfdsl;gjkfdljgdfksjg;sdfjgkfdljgkdfsjgdf;jgfdkjgk;dfsjgkfdl;bjnfkblnfsdb;fmsbkfs;f;dsfsdkfldskfld;skgfladgkjfdlgjdfklgjkfdljgksfdlgjfdskgjfdsl;gjkfdljgdfksjg;sdfjgkfdljgkdfsjgdf;jgfdkjgk;dfsjgkfdl;bjnfkblnfsdb;fmsbkfs;f;dsfsdkfldskfld;skgfladgkjfdlgjdfklgjkfdljgksfdlgjfdskgjfdsl;gjkfdljgdfksjg;sdfjgkfdljgkdfsjgdf;jgfdkjgk;dfsjgkfdl;bjnfkblnfsdb;fmsbkfs;f;dsfsdkfldskfld;skgfladgkjfdlgjdfklgjkfdljgksfdlgjfdskgjfdsl;gjkfdljgdfksjg;sdfjgkfdljgkdfsjgdf;jgfdkjgk;dfsjgkfdl;bjnfkblnfsdb;fmsbkfs;laa',
-
-
-
-	        			updatedAt: new Date()
-	        		}
-		        ], // TODO get initial and listen over websocket
-		        // a preview of say an article
-		        // with title etc
-		        readingPreview: { title:'ttttt', description: 'this is da thing', image_url: 'fdsfds' }
-		    };
-		},
+		
 
 		/*
 			React lifecycle
 		*/
 
 
+		getInitialState: function() {
+		    return {
+		    	currentUser: null,
+		        suggestions: [{id: 23, title:'aaaaa', image_url: 'imgggg'}],
+		        myReadings: [], // books
+		        myArticles: [],
+		        posts: [], // TODO listen over websocket
+		        // a preview of say an article
+		        // with title etc
+		        readingPreview: { title:'ttttt', description: 'this is da thing', image_url: 'fdsfds' }
+		    };
+		},
+
 
 		componentDidMount: function() {
+			var that = this;
 		      // get books and articles
+		      // Helpers.ajaxReq('GET', url, data, cb)
+
+
+		      // get posts i.e. feed
+		      Helpers.ajaxReq('GET', Config.API_URL + '/feed/posts', {}, function(err, result) {
+				// console.log(JSON.stringify(result));
+
+				that.setState({
+					posts: result
+				});
+			  });
+
+
+		      // get user's readings
+		      Auth.getCurrentUser(function(err, user) {
+		      	if (!user || err) {
+		      		console.log('didnt get current user');
+		      		return;
+		      	}
+				Helpers.ajaxReq('GET', Config.API_URL + '/users/'+ user.id +'/readings', {}, function(err, result) {
+					if (!user || err) {
+			      		console.log('didnt get readings');
+			      		return;
+			      	}
+					that.setState({
+						myReadings: result,
+						currentUser: user
+					});
+				});
+		      });
+
+		   
 		},
 
 

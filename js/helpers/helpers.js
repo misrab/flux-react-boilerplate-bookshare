@@ -1,7 +1,30 @@
 define([
-
 ], function() {
 	var result = {};
+
+
+	// console.log(Auth);
+
+
+	result.ajaxReq = function(type, url, data, cb) {
+		var that = this;
+
+		$.ajax({
+			type: type,
+			beforeSend: function(xhr) { xhr.setRequestHeader("Authorization", "Basic " + localStorage.token); },
+			url: url,
+			data: JSON.stringify(data),
+			contentType: 'application/json', 
+			success: function(result) {
+				cb(null, result);
+			},
+			error: function(err) {
+				console.log('error: ' + JSON.stringify(err));
+				cb(err);
+			}
+		});
+	};
+
 
 	result.showAlert = function(msg, type) {
 		var str = '.alert-' + type;

@@ -171,34 +171,46 @@ function(
       		return Helpers.showAlert('Please provide an email and password', 'danger');
       	}
 
-      	// console.log(data); return;
 
-      	$.ajax({
-		    url: url, 
-		    type: 'POST',
-		    contentType: 'application/json', 
-		    data: JSON.stringify(data),
-		    // beforeSend: function(xhr) { xhr.setRequestHeader("Authorization", "Basic " + Auth.getToken()); },
-		    success: function(result) {
-		    	console.log('success: ' + result);
-		    	if (!result) {
-		    		return cb(new Error("Invalid username or password"), null);
-		    	}
+	  	Helpers.ajaxReq('POST', url, data, function(err, result) {
+	  		if (err) {
+	  			return cb(new Error("Error authenticating user"), null);
+	  		}
+	  		if (!result) {
+	    		return cb(new Error("Invalid username or password"), null);
+	    	}
+
+	    	localStorage.token = btoa(result.email + ":" + result.hash);
+	    	
+	  		cb(null, result);
+	  	});
+
+    //   	$.ajax({
+		  //   url: url, 
+		  //   type: 'POST',
+		  //   contentType: 'application/json', 
+		  //   data: JSON.stringify(data),
+		  //   // beforeSend: function(xhr) { xhr.setRequestHeader("Authorization", "Basic " + Auth.getToken()); },
+		  //   success: function(result) {
+		  //   	console.log('success: ' + result);
+		  //   	if (!result) {
+		  //   		return cb(new Error("Invalid username or password"), null);
+		  //   	}
 
 
-		    	localStorage.token = btoa(result.email + ":" + result.hash);
+		  //   	localStorage.token = btoa(result.email + ":" + result.hash);
 
-		    	if (cb) cb(null, result);
+		  //   	if (cb) cb(null, result);
 		    	
-		    	// Helpers.showAlert('Force run worked', 'success');
-		    },
-		    error: function() {
-		    	// console.log('error...');
-		    	if (cb) cb(new Error("Error authenticating user"), null);
+		  //   	// Helpers.showAlert('Force run worked', 'success');
+		  //   },
+		  //   error: function() {
+		  //   	// console.log('error...');
+		  //   	if (cb) cb(new Error("Error authenticating user"), null);
 		    	
-		    	// Helpers.showAlert('Forced run failed', 'danger');
-		    }
-		  });
+		  //   	// Helpers.showAlert('Forced run failed', 'danger');
+		  //   }
+		  // });
       },
 
       signup: function(e) {
@@ -207,7 +219,7 @@ function(
 
       	that.loginHelper(Config.API_URL + '/users', function(err, user) {
       		if (err) return Helpers.showAlert("That email is already registered", 'danger');
-      		console.log(user);
+      		// console.log(user);
 
       		window.location.replace('#/app/home');
       	});
@@ -220,7 +232,7 @@ function(
 
       	that.loginHelper(Config.API_URL + '/login', function(err, user) {
       		if (err) return Helpers.showAlert("Invalid username or password", 'danger');
-      		console.log(user);
+      		// console.log(user);
 
 			window.location.replace('#/app/home');
       	});

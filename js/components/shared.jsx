@@ -22,13 +22,14 @@ function(
 			if (!data) return null;
 
 
+			// console.log(data);
 			// first limit number of words, then number of characters
-			var description = data.description;
+			var comment = data.comment;
 			if (
-				data.description.length > 200
-				|| data.description.split(" ").length > 50
+				data.comment.length > 200
+				|| data.comment.split(" ").length > 50
 				) {
-				description = data.description.split(" ").slice(0, 50).join(" ").slice(0, 200) 
+				comment = data.comment.split(" ").slice(0, 50).join(" ").slice(0, 200) 
 					+ "..."; // TODO maybe Read More
 			}
 
@@ -37,7 +38,7 @@ function(
 				<div className="feed_item">
 					{/* user and meta */}
 					<div style={{backgroundColor: 'lightgrey', padding: '5px', margin: '5px 0'}}>
-						<strong>{data.user.username}</strong> { moment(data.updatedAt).calendar().toLowerCase() }
+						<strong>{data.user.email}</strong> { moment(data.updatedAt).calendar().toLowerCase() }
 					</div>
 
 					{/* reading summary */}
@@ -53,7 +54,7 @@ function(
 					<div className="" style={{width: '65%', display:'inline-block', verticalAlign: 'top', marginLeft:'10px', fontSize: '1.25em'}}>
 						{/* actual post */}
 						<div className="description">
-							{ description }
+							{ comment }
 						</div>
 					</div>
 
@@ -210,7 +211,7 @@ function(
 								{/*<Shared.Autocomplete sourceCallback={that.props.getBookSuggestions} selectCallback={that.props.addReading} data={that.props.suggestions} placeholder="Book title" name="new_book_title" />*/}
 
 								{
-									that.props.myReadings.length ? that.props.myReadings.map(function(v, i) {
+									that.props.myReadings && that.props.myReadings.length ? that.props.myReadings.map(function(v, i) {
 										return <ReadingSummary deleteReading={that.props.deleteReading} data={v} key={i} />
 									}) : "You don't have any books recorded. Try posting about one in your feed!"
 								}
@@ -221,7 +222,7 @@ function(
 
 								{/*<input type='text' placeholder='Url link' className='form-control box' />*/}
 								{
-									that.props.myArticles.length ? that.props.myArticles.map(function(v, i) {
+									that.props.myArticles && that.props.myArticles.length ? that.props.myArticles.map(function(v, i) {
 										return <ReadingSummary deleteReading={that.props.deleteReading} data={v} key={i} />
 									}) : "You don't have any articles recorded. Try posting about one in your feed!"
 								}
@@ -251,12 +252,12 @@ function(
 			Helpers.removeFromState(that, 'myReadings', 'id', reading.id);
 		},
 
-		getInitialState() {
-		    return {
-		        myReadings: [], // books
-		        myArticles: []
-		    };
-		},
+		// getInitialState() {
+		//     return {
+		//         myReadings: [], // books
+		//         myArticles: []
+		//     };
+		// },
 
 
 		render: function() {
@@ -275,7 +276,7 @@ function(
 							</a>
 
 							{/* body */}
-							<ReadingViewer deleteReading={that.deleteReading} myReadings={that.state.myReadings} myArticles={that.state.myArticles} />
+							<ReadingViewer deleteReading={that.deleteReading} myReadings={that.props.myReadings} myArticles={that.props.myArticles} />
 							
 
 						</div>
