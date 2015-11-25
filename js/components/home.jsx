@@ -257,6 +257,8 @@ function(
 			// turn the value into json
 			var data = JSON.parse(ui.item.value);
 
+			// console.log(data);
+
 			// TEMP
 			// TEMP functions
 			// function getRandomInt(min, max) {
@@ -285,6 +287,8 @@ function(
 			// console.log('selectBook');
 		},
 
+
+		// this is actually when they post a post to their feed
 		addReading: function(e) {
 			var that = this;
 
@@ -294,73 +298,152 @@ function(
 			// var el = $(e.target);
 
 
-			
-			
-			var reading = that.state.previewReading;
-			// end TEMP
-
-			// console.log(reading);
-			// console.log(that.state.currentUser);
-			// return;
-
-
-			// post association
-			var that = this;
+			function postReading(that, reading) {
+				// post association
 		  	var url = Config.API_URL + "/users_readings";
 		  	var data = { reading_id: reading.id || 0 };
 		  	Helpers.ajaxReq('POST', url, data, function(err, result) {
 		  		console.log(err); // user could already be associated
 		  		// console.log(result);
 		  	});
-		  	// return;
 
 
-			// add post to feed
-			// get description
-			// this is for the browser side
-			var comment = $('#post_description').val() || "Was just reading";
-			var post = {};
-			post.comment = comment;
-			post.reading = reading;
-			post.user = that.state.currentUser;
-			that.setState({
-				posts: that.state.posts.concat([post])
-			});
-
-			// post actual post server side
-			var postData = {};
-			postData.comment = comment;
-			postData.user_id = that.state.currentUser.id;
-			postData.reading_id = reading.id;
-			console.log('posting post: ' + JSON.stringify(postData));
-			Helpers.ajaxReq('POST', Config.API_URL + "/posts", postData, function(err, result) {
-		  		console.log(err); // user could already be associated
-		  		console.log(result);
-		  	});
-
-
-			// only add if not in readings
-			var found = false;
-			for (var i=0; i < that.state.myReadings.length; i++) {
-				if (reading.id === that.state.myReadings[i].id) {
-					found = true;
-					break;
-				}
-			}
-			if (!found) {
+				// add post to feed
+				// get description
+				// this is for the browser side
+				var comment = $('#post_description').val() || "Was just reading";
+				var post = {};
+				post.comment = comment;
+				post.reading = reading;
+				post.user = that.state.currentUser;
 				that.setState({
-					myReadings: that.state.myReadings.concat([reading])
+					posts: that.state.posts.concat([post])
 				});
+
+				// post actual post server side
+				var postData = {};
+				postData.comment = comment;
+				postData.user_id = that.state.currentUser.id;
+				postData.reading_id = reading.id;
+				console.log('posting post: ' + JSON.stringify(postData));
+				Helpers.ajaxReq('POST', Config.API_URL + "/posts", postData, function(err, result) {
+			  		console.log(err); // user could already be associated
+			  		console.log(result);
+			  	});
+
+
+				// only add if not in readings
+				var found = false;
+				for (var i=0; i < that.state.myReadings.length; i++) {
+					if (reading.id === that.state.myReadings[i].id) {
+						found = true;
+						break;
+					}
+				}
+				if (!found) {
+					that.setState({
+						myReadings: that.state.myReadings.concat([reading])
+					});
+				}
+
+
+				// TODO clear the inputs on success
+				// also clear the previewReading
+				that.setState({
+					previewReading: null
+				});
+				$('#new_post_panel').find('input').val('');
+				$('#new_post_panel').find('textarea').val('');
+
+			};
+
+			
+			var reading = that.state.previewReading;
+
+
+			// if there's no id assume it's an article
+			// (TODO if we allow them to add a book not included, this 
+			// assumption changes)
+			// post the article first
+			if (!reading.id) {
+				reading['is_book'] = false;
+				Helpers.ajaxReq('POST', Config.API_URL+'/readings', reading, function(err, result) {
+					if (err) { return console.log('error creating new reading'); }
+					var reading = result;
+					that.setState({ previewReading: reading });
+					postReading(that, reading);
+					// console.log(result);
+				});
+
+
+			} else {
+				// already a reading with an id in the db
+				postReading(that, reading);
+
 			}
 
 
-			// TODO clear the inputs on success
-			// also clear the previewReading
-			that.setState({
-				previewReading: null
-			});
-			$('#new_post_panel').find('input').val('');
-			$('#new_post_panel').find('textarea').val('');
+			// TEMP
+			return;
+
+
+			// post association
+			// var that = this;
+		 //  	var url = Config.API_URL + "/users_readings";
+		 //  	var data = { reading_id: reading.id || 0 };
+		 //  	Helpers.ajaxReq('POST', url, data, function(err, result) {
+		 //  		console.log(err); // user could already be associated
+		 //  		// console.log(result);
+		 //  	});
+		 //  	// return;
+
+
+			// // add post to feed
+			// // get description
+			// // this is for the browser side
+			// var comment = $('#post_description').val() || "Was just reading";
+			// var post = {};
+			// post.comment = comment;
+			// post.reading = reading;
+			// post.user = that.state.currentUser;
+			// that.setState({
+			// 	posts: that.state.posts.concat([post])
+			// });
+
+			// // post actual post server side
+			// var postData = {};
+			// postData.comment = comment;
+			// postData.user_id = that.state.currentUser.id;
+			// postData.reading_id = reading.id;
+			// console.log('posting post: ' + JSON.stringify(postData));
+			// Helpers.ajaxReq('POST', Config.API_URL + "/posts", postData, function(err, result) {
+		 //  		console.log(err); // user could already be associated
+		 //  		console.log(result);
+		 //  	});
+
+
+			// // only add if not in readings
+			// var found = false;
+			// for (var i=0; i < that.state.myReadings.length; i++) {
+			// 	if (reading.id === that.state.myReadings[i].id) {
+			// 		found = true;
+			// 		break;
+			// 	}
+			// }
+			// if (!found) {
+			// 	that.setState({
+			// 		myReadings: that.state.myReadings.concat([reading])
+			// 	});
+			// }
+
+
+			// // TODO clear the inputs on success
+			// // also clear the previewReading
+			// that.setState({
+			// 	previewReading: null
+			// });
+			// $('#new_post_panel').find('input').val('');
+			// $('#new_post_panel').find('textarea').val('');
 		},
 
 
@@ -412,6 +495,21 @@ function(
 
 
 			// 1. get title, image (for now)
+			Helpers.ajaxReq("POST", Config.API_URL + "/link_preview", {url:url}, function(err, result) {
+				if (err) {
+					console.log('error: ' + JSON.stringify(err));
+					return; // TODO say invalid
+				}
+
+				// CAREFUL if result format changes 
+				// will need to convert to {title, description, image_url}
+				// console.log(result);
+
+				// make a preview
+				that.setState({ previewReading: result });
+
+				// console.log(result);
+			});
 
 
 			// 2. create the "reading"
@@ -462,51 +560,61 @@ function(
 
 		getInitialState: function() {
 		    return {
-		    	currentUser: null,
+		    		currentUser: null,
 		        suggestions: [{id: 23, title:'aaaaa', image_url: 'imgggg'}],
 		        myReadings: [], // books
 		        myArticles: [],
-		        posts: [], // TODO listen over websocket
+		        posts: [] // TODO listen over websocket
+		        , readingPreview: null
 		        // a preview of say an article
 		        // with title etc
-		        readingPreview: { title:'ttttt', description: 'this is da thing', image_url: 'fdsfds' }
+		        // , previewReading: { title:'ttttt', description: 'this is da thing', image_url: 'fdsfds' }
 		    };
 		},
 
 
 		componentDidMount: function() {
 			var that = this;
-		      // get books and articles
-		      // Helpers.ajaxReq('GET', url, data, cb)
 
 
-		      // get posts i.e. feed
-		      Helpers.ajaxReq('GET', Config.API_URL + '/feed/posts', {}, function(err, result) {
-				// console.log(JSON.stringify(result));
+
+
+		  // get posts i.e. feed
+		  Helpers.ajaxReq('GET', Config.API_URL + '/feed/posts', {}, function(err, result) {
+			// console.log(JSON.stringify(result));
 
 				that.setState({
 					posts: result
 				});
-			  });
+		  });
 
 
-		      // get user's readings
-		      Auth.getCurrentUser(function(err, user) {
-		      	if (!user || err) {
-		      		console.log('didnt get current user');
-		      		return;
-		      	}
+      // get user's readings
+      Auth.getCurrentUser(function(err, user) {
+      	// first check user
+      	if (!user || err) {
+      		console.log('didnt get current user');
+      		Auth.logout();
+      		return;
+      	}
+      	// next get user's readings
 				Helpers.ajaxReq('GET', Config.API_URL + '/users/'+ user.id +'/readings', {}, function(err, result) {
 					if (!user || err) {
-			      		console.log('didnt get readings');
-			      		return;
-			      	}
+	      		console.log('didnt get readings');
+	      		return;
+	      	}
+
+			    // TODO split books and articles, or run 2 queries with ?is_book=
+			    var splitReadings = Helpers.splitReadings(result);
+
+
 					that.setState({
-						myReadings: result,
+						myReadings: splitReadings[0], // result
+						myArticles: splitReadings[1],
 						currentUser: user
 					});
 				});
-		      });
+		  });
 
 		   
 		},
