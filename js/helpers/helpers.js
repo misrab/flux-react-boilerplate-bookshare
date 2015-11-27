@@ -8,6 +8,24 @@ define([
 		$('.loader').toggle();
 	},
 
+	result.splitReadings = function(arr) {
+		var books = [];
+		var articles = [];
+		
+		try {
+			for (var i=0; i < arr.length; i++) {
+				if (arr[i].is_book) {
+					books.push(arr[i]);
+				} else {
+					articles.push(arr[i]);
+				}
+			}
+
+			return [books, articles];
+		} catch(err) {
+			return [[],[]];
+		}	
+	};
 
 	result.ajaxReq = function(type, url, data, cb) {
 		var that = this;

@@ -239,7 +239,7 @@ function(
       },
 
 		logout: function(e) {
-			e.preventDefault();
+			if (e) e.preventDefault();
 			console.log('logout');
 
 			delete localStorage.token;

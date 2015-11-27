@@ -27,7 +27,7 @@ define([
 	  	var url = Config.API_URL + "/current_user";
 
 
-	  				  	// console.log(atob(localStorage.token));
+	  	// console.log(atob(localStorage.token));
 
 	  	Helpers.ajaxReq('GET', url, {}, cb);
 
@@ -65,6 +65,21 @@ define([
 	  	return localStorage.token;
 	  },
 
+
+	  logout: function(e) {
+			if (e) e.preventDefault();
+			console.log('logout');
+
+			delete localStorage.token;
+			// TODO set state, location
+
+
+			// console.log(data);
+			// Auth.logout();
+			// auto login for now
+			// this.setState({ currentUser: null });
+			window.location.replace("/");
+		}
 	 //  login: function(data, cb) {
 	 //  	var url = Config.API_URL + "/user/login";
 	 //  	$.ajax({
