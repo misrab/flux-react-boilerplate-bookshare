@@ -4,6 +4,9 @@ define([
 
 
 	// console.log(Auth);
+	result.toggleLoader = function() {
+		$('.loader').toggle();
+	},
 
 
 	result.ajaxReq = function(type, url, data, cb) {

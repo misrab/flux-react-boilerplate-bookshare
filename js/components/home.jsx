@@ -7,6 +7,12 @@ function(
 	Shared, Helpers,
 	React, $, jqueryUI) {
 
+	/*
+		Constants
+	*/
+
+
+
 	var result = {};
 
 
@@ -206,7 +212,7 @@ function(
 
 							</div>
 							<div className="col-md-7">
-								<Shared.PostViewer data={that.props.posts} />
+								<Shared.PostViewer feedSeeMore={that.props.feedSeeMore} data={that.props.posts} />
 							</div>
 						</div>
 						
@@ -453,6 +459,31 @@ function(
 
 		},
 
+
+
+		feedSeeMore: function(e) {
+			e.preventDefault();
+			var that = this;
+
+			// console.log('see more...');
+
+			// get more with offset and increment offset
+
+			// ajaxReq = function(type, url, data, cb)
+			Helpers.toggleLoader();
+			Helpers.ajaxReq('GET', Config.API_URL + '/feed/posts?offset=' + that.state.postOffset, {}, function(err, result) {
+				Helpers.toggleLoader();
+
+				// console.log(JSON.stringify(result));
+				if (!result || !result.length) return;
+				
+				that.setState({
+					posts: that.state.posts.concat(result),
+					postOffset: that.state.postOffset + Config.POST_OFFSET_INCREMENT
+				});
+			});
+		},
+
 		
 
 		/*
@@ -462,6 +493,9 @@ function(
 
 		getInitialState: function() {
 		    return {
+		    	// the current post offset
+		    	postOffset: Config.POST_OFFSET_INCREMENT,
+
 		    	currentUser: null,
 		        suggestions: [{id: 23, title:'aaaaa', image_url: 'imgggg'}],
 		        myReadings: [], // books
@@ -530,7 +564,7 @@ function(
 							</a>
 
 							{/* body */}
-							<Feed previewReading={that.state.previewReading} posts={that.state.posts} getBookSuggestions={that.getBookSuggestions} addReading={that.addReading} selectBook={that.selectBook} handleLink={that.handleLink}  />
+							<Feed feedSeeMore={that.feedSeeMore} previewReading={that.state.previewReading} posts={that.state.posts} getBookSuggestions={that.getBookSuggestions} addReading={that.addReading} selectBook={that.selectBook} handleLink={that.handleLink}  />
 
 
 							<Shared.ReadingViewer deleteReading={that.deleteReading} myReadings={that.state.myReadings} myArticles={that.state.myArticles} />

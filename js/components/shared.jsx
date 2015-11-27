@@ -1,8 +1,10 @@
 define([
 	// './auth', './config',
+	'../helpers/config',
 	'react', 'jquery', 'moment'], 
 function(
 	// Auth, Config,
+	Config,
 	React, $, moment) {
 
 	var result = {};
@@ -82,6 +84,8 @@ function(
 							return <FeedItem data={v} key={i} />;
 						})
 					}
+
+					<div className="btn btn-default text-center full_width box" onClick={that.props.feedSeeMore}>See more</div>
 				</div>
 			)
 		}
