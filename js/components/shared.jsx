@@ -30,9 +30,13 @@ function(
 					+ "..."; // TODO maybe Read More
 			}
 
+			// console.log(that.props.currentUser);
+			// console.log(data.user)
+			// console.log(that.props.currentUser && (that.props.currentUser.id === data.user.id))
+
 			// cancel button if user posted this
 			var cancel;
-			if (that.props.currentUser.id === data.user.id) {
+			if (that.props.currentUser && (that.props.currentUser.id === data.user.id)) {
 				cancel = <Cancel data={data} handler={that.props.deletePost} />;
 			} 
 			// {that.props.currentUser}

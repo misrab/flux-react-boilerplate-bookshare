@@ -31,7 +31,11 @@ define([
 	  	// console.log(atob(localStorage.token));
 
 	  	Helpers.ajaxReq('GET', url, {}, function(err, result) {
-			if (err || !result) return console.log('Error getting current user: ' + JSON.stringify(err));
+			if (err || !result || !Object.keys(result).length) {
+				console.log('Error getting current user: ' + JSON.stringify(err));
+				if (cb) { cb(err, result); }
+				return
+			}
 			
 			// console.log(result);
 
@@ -40,7 +44,7 @@ define([
 			that.setState({
 				currentUser: result
 			}, function() {
-				if (cb) cb();
+				if (cb) cb(err, result);
 			});
 		});
 	  },

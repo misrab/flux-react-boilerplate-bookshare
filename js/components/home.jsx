@@ -207,13 +207,22 @@ function(
 									</textarea>
 
 
-
-									<div onClick={that.props.addReading} className="btn btn-primary box half_width small_space_top">
-										Private Note
-									</div>
-									<div id="postButton" onClick={that.props.addReading} className="btn btn-success box half_width small_space_top">
-										Open Post
-									</div>
+									{
+										// show buttons only if a reading preview
+										// has been found
+										that.props.previewReading ? (
+											<div>
+												<div onClick={that.props.addReading} className="btn btn-primary box half_width small_space_top">
+													Private Note
+												</div>
+												<div id="postButton" onClick={that.props.addReading} className="btn btn-success box half_width small_space_top">
+													Open Post
+												</div>
+											</div>
+										) : null
+										
+									}
+									
 
 								</div>
 

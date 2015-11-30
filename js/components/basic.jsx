@@ -473,6 +473,16 @@ function(
 			};
 		},
 
+		componentDidMount: function() {
+			var that = this;
+	      	Auth.getCurrentUser(that, function(err, result) {
+	      		if (result) {
+	      			// redirect to home page
+	      			window.location.replace("#/app/home");
+	      		}
+	      	});
+		},
+
 		render: function() {
 			var that = this;
 

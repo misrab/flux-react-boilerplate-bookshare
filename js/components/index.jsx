@@ -1,9 +1,9 @@
 define([
 	'react', 'react-router', 'jquery',
-	'./basic', './home', './shared'
+	'./basic', './home', './shared', './reading_zoom'
 ], 
 function(React, Router, $,
-	Basic, Home, Shared) {
+	Basic, Home, Shared, ReadingZoom) {
 	
 
 	function mergeObj(obj1, obj2) {
@@ -17,6 +17,7 @@ function(React, Router, $,
 	mergeObj(result, Basic);
   	mergeObj(result, Home);
   	mergeObj(result, Shared);
+  	mergeObj(result, ReadingZoom);
 
 
 	return result;
