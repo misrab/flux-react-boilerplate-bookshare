@@ -212,7 +212,7 @@ function(
 
 							</div>
 							<div className="col-md-7">
-								<Shared.PostViewer feedSeeMore={that.props.feedSeeMore} data={that.props.posts} />
+								<Shared.PostViewer feedSeeMoreLoading={that.props.feedSeeMoreLoading} feedSeeMore={that.props.feedSeeMore} data={that.props.posts} />
 							</div>
 						</div>
 						
@@ -231,26 +231,7 @@ function(
 
 	result.Home = React.createClass({
 		deleteReading: function(reading, e) {
-			var that = this;
-
-			e.preventDefault();
-
-			// console.log(that.state.myReadings);
-
-			// TODO confirmation modal
-
-			// TODO actually delete association
-		  	var url = Config.API_URL + "/users_readings/" + reading.id;
-		  	// var data = { reading_id: reading.id || 0 };
-		  	console.log(url);
-		  	Helpers.ajaxReq('DELETE', url, {}, function(err, result) {
-		  		console.log(err);
-		  		// console.log(result);
-		  	});
-
-
-			// then remove from state
-			Helpers.removeFromState(that, 'myReadings', 'id', reading.id);
+			Helpers.deleteReading(that, reading, e);
 		},
 
 		selectBook: function(e, ui) {
@@ -309,7 +290,7 @@ function(
 		  	var url = Config.API_URL + "/users_readings";
 		  	var data = { reading_id: reading.id || 0 };
 		  	Helpers.ajaxReq('POST', url, data, function(err, result) {
-		  		console.log(err); // user could already be associated
+		  		if (err) console.log(err); // user could already be associated
 		  		// console.log(result);
 		  	});
 
@@ -331,26 +312,32 @@ function(
 				postData.comment = comment;
 				postData.user_id = that.state.currentUser.id;
 				postData.reading_id = reading.id;
-				console.log('posting post: ' + JSON.stringify(postData));
+				// console.log('posting post: ' + JSON.stringify(postData));
 				Helpers.ajaxReq('POST', Config.API_URL + "/posts", postData, function(err, result) {
 			  		console.log(err); // user could already be associated
-			  		console.log(result);
+			  		// console.log(result);
 			  	});
 
+				
+				// decide if book or article and update appropriately
+				var modelName = reading.is_book ? 'myReadings' : 'myArticles';
 
-				// only add if not in readings
+
 				var found = false;
-				for (var i=0; i < that.state.myReadings.length; i++) {
-					if (reading.id === that.state.myReadings[i].id) {
+				for (var i=0; i < that.state[modelName].length; i++) {
+					if (reading.id === that.state[modelName][i].id) {
 						found = true;
 						break;
 					}
 				}
 				if (!found) {
-					that.setState({
-						myReadings: that.state.myReadings.concat([reading])
-					});
+					var newState = that.state;
+					newState[modelName] = that.state[modelName].concat([reading]);
+					that.setState(newState);
 				}
+
+
+
 
 
 				// TODO clear the inputs on success
@@ -518,43 +505,6 @@ function(
 			});
 
 
-			// 2. create the "reading"
-
-			// 3. POST the reading
-
-			// 4. add the post
-
-
-
-			// var metaDesc = $.get(str, function (data) {
-			// 	var MetaDescription = $(data).find('meta[name=description]').attr("content");
-			// 	var Img_Src = $(data).find('link[rel=image_src]').attr("href");
-			// 	console.log(MetaDescription);
-			// 	console.log(Img_Src);
-			// });
-			
-			// e.preventDefault();
-			// var item = ui.item;
-
-			// TODO post it
-
-			// TEMP functions
-			// function getRandomInt(min, max) {
-			//   return Math.floor(Math.random() * (max - min)) + min;
-			// }
-			// var reading = {id: getRandomInt(1,1000), title: str, image_url: 'http://theartmad.com/wp-content/uploads/2015/02/Cute-Monkeys-6.jpg'}; // item.value
-
-
-			// // console.log(reading); return;
-
-			// that.setState({
-			// 	myArticles: that.state.myArticles.concat([reading])
-			// });
-
-
-			// // clear the input
-			// el.val('');
-
 		},
 
 
@@ -563,14 +513,11 @@ function(
 			e.preventDefault();
 			var that = this;
 
-			// console.log('see more...');
-
-			// get more with offset and increment offset
-
-			// ajaxReq = function(type, url, data, cb)
-			Helpers.toggleLoader();
+			that.setState({
+				feedSeeMoreLoading: true
+			});
 			Helpers.ajaxReq('GET', Config.API_URL + '/feed/posts?offset=' + that.state.postOffset, {}, function(err, result) {
-				Helpers.toggleLoader();
+				that.setState({ feedSeeMoreLoading: false });
 
 				// console.log(JSON.stringify(result));
 				if (!result || !result.length) return;
@@ -591,12 +538,14 @@ function(
 
 		getInitialState: function() {
 		    return {
-		    		currentUser: null,
+		    		// currentUser: null,
 		        suggestions: [{id: 23, title:'aaaaa', image_url: 'imgggg'}],
 		        myReadings: [], // books
 		        myArticles: [],
 		        posts: [] // TODO listen over websocket
 		        , readingPreview: null
+		        , postOffset: Config.POST_OFFSET_INCREMENT
+		        , feedSeeMoreLoading: false
 		        // a preview of say an article
 		        // with title etc
 		        // , previewReading: { title:'ttttt', description: 'this is da thing', image_url: 'fdsfds' }
@@ -607,47 +556,16 @@ function(
 		componentDidMount: function() {
 			var that = this;
 
+			console.log(that.props.currentUser);
+
+			// get posts i.e. feed
+			Helpers.ajaxReq('GET', Config.API_URL + '/feed/posts', {}, function(err, result) {
+				that.setState({ posts: result });
+			});
 
 
-
-		  // get posts i.e. feed
-		  Helpers.ajaxReq('GET', Config.API_URL + '/feed/posts', {}, function(err, result) {
-			// console.log(JSON.stringify(result));
-
-				that.setState({
-					posts: result
-				});
-		  });
-
-
-      // get user's readings
-      Auth.getCurrentUser(function(err, user) {
-      	// first check user
-      	if (!user || err) {
-      		console.log('didnt get current user');
-      		Auth.logout();
-      		return;
-      	}
-      	// next get user's readings
-				Helpers.ajaxReq('GET', Config.API_URL + '/users/'+ user.id +'/readings', {}, function(err, result) {
-					if (!user || err) {
-	      		console.log('didnt get readings');
-	      		return;
-	      	}
-
-			    // TODO split books and articles, or run 2 queries with ?is_book=
-			    var splitReadings = Helpers.splitReadings(result);
-
-
-					that.setState({
-						myReadings: splitReadings[0], // result
-						myArticles: splitReadings[1],
-						currentUser: user
-					});
-				});
-		  });
-
-		   
+			Shared.getReadingsState(that);
+			
 		},
 
 
@@ -669,7 +587,7 @@ function(
 							</a>
 
 							{/* body */}
-							<Feed feedSeeMore={that.feedSeeMore} previewReading={that.state.previewReading} posts={that.state.posts} getBookSuggestions={that.getBookSuggestions} addReading={that.addReading} selectBook={that.selectBook} handleLink={that.handleLink}  />
+							<Feed feedSeeMoreLoading={that.state.feedSeeMoreLoading} feedSeeMore={that.feedSeeMore} previewReading={that.state.previewReading} posts={that.state.posts} getBookSuggestions={that.getBookSuggestions} addReading={that.addReading} selectBook={that.selectBook} handleLink={that.handleLink}  />
 
 
 							<Shared.ReadingViewer deleteReading={that.deleteReading} myReadings={that.state.myReadings} myArticles={that.state.myArticles} />

@@ -1,10 +1,8 @@
 define([
-	// './auth', './config',
-	'../helpers/config',
+	'../helpers/auth', '../helpers/config', '../helpers/helpers',
 	'react', 'jquery', 'moment'], 
 function(
-	// Auth, Config,
-	Config,
+	Auth, Config, Helpers,
 	React, $, moment) {
 
 	var result = {};
@@ -44,6 +42,8 @@ function(
 					</div>
 
 					{/* reading summary */}
+					<ReadingSummary data={data.reading} />
+					{/*
 					<div className="reading_summary" style={{display:'inline-block', margin: '0'}}>
 						<div className="overflow_container">
 							<strong>{data.reading.title}</strong>
@@ -52,6 +52,7 @@ function(
 							</object>
 						</div>
 					</div>
+					*/}
 
 					<div className="" style={{width: '65%', display:'inline-block', verticalAlign: 'top', marginLeft:'10px', fontSize: '1.25em'}}>
 						{/* actual post */}
@@ -75,6 +76,19 @@ function(
 			var that = this;
 			var data = that.props.data;
 
+
+			var button;
+			if (that.props.feedSeeMoreLoading) {
+				button = <center>
+					<img style={{height:'50px'}} src="img/loader.gif" />
+				</center>;
+			} else {
+				button = <div style={{display:'block', position:'relative'}} className="btn btn-default text-center full_width box" onClick={that.props.feedSeeMore}>
+					See more
+				</div>;
+			}
+			
+
 			if (!data || !data.length) return <div>"No posts to show"</div>;
 
 			return (
@@ -85,7 +99,7 @@ function(
 						})
 					}
 
-					<div className="btn btn-default text-center full_width box" onClick={that.props.feedSeeMore}>See more</div>
+					{ button }
 				</div>
 			)
 		}
@@ -178,14 +192,25 @@ function(
 			if (!data) return null;
 			// <Shared.Cancel data={data} handler={that.props.deleteReading} />
 
+			// decide on image url
+			var image_url = Helpers.getImageCover(data);
+			var title;
+			if (!image_url) {
+				title = <strong>{data.title}</strong>;
+				image_url = "img/logo_grey.png";
+			}
+
+			// console.log(Helpers.getImageCover)
+
 			return (
 				<div className="reading_summary">
 					<div className="overflow_container">
-						<strong>{data.title}</strong>
+						{ title	}
+						
 
 						<Cancel data={data} handler={that.props.deleteReading} />
 
-						<object data={data.image_url} type="image/png">
+						<object data={image_url} type="image/png">
 							<img src="img/logo_grey.png" />
 						</object>
 					</div>
@@ -240,28 +265,56 @@ function(
 	result.ReadingViewer = ReadingViewer;
 
 
+
+
+	result.getReadingsState = function(that) {
+		// get user's readings
+		Auth.getCurrentUser(function(err, user) {
+			// first check user
+			if (!user || err) {
+				console.log('didnt get current user');
+				Auth.logout();
+				return;
+			}
+			// next get user's readings
+			Helpers.ajaxReq('GET', Config.API_URL + '/users/'+ user.id +'/readings', {}, function(err, result) {
+				if (!user || err) {
+					console.log('didnt get readings');
+					return;
+				}
+
+				// TODO split books and articles, or run 2 queries with ?is_book=
+				var splitReadings = Helpers.splitReadings(result);
+
+
+				that.setState({
+					myReadings: splitReadings[0], // result
+					myArticles: splitReadings[1],
+					currentUser: user
+				});
+			});
+		});
+	};
+
+
 	result.Readings = React.createClass({
 		deleteReading: function(reading, e) {
 			var that = this;
-
-			e.preventDefault();
-
-			// console.log(that.state.myReadings);
-
-			// TODO confirmation modal
-
-			// TODO actually delete
-
-			// then remove from state
-			Helpers.removeFromState(that, 'myReadings', 'id', reading.id);
+			Helpers.deleteReading(that, reading, e);
 		},
 
-		// getInitialState() {
-		//     return {
-		//         myReadings: [], // books
-		//         myArticles: []
-		//     };
-		// },
+		getInitialState: function() {
+		    return {
+		        myReadings: [], // books
+		        myArticles: []
+		    };
+		},
+
+
+		componentDidMount: function() {
+			var that = this;
+			result.getReadingsState(that);
+		},
 
 
 		render: function() {

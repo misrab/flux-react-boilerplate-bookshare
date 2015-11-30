@@ -264,7 +264,7 @@ function(
 					</div>
 
 
-					<RouteHandler login={that.login} logout={that.logout} signup={that.signup} />
+					<RouteHandler currentUser={that.state.currentUser} login={that.login} logout={that.logout} signup={that.signup} />
 
 
 					{/* Footer */}

@@ -3,6 +3,49 @@ define([
 	var result = {};
 
 
+	result.deleteReading = function(that, reading, e) {
+		var that = this;
+
+		e.preventDefault();
+
+		// console.log(that.state.myReadings);
+
+		// TODO confirmation modal
+
+		// TODO actually delete association
+	  	var url = Config.API_URL + "/users_readings/" + reading.id;
+	  	// var data = { reading_id: reading.id || 0 };
+	  	// console.log(url);
+	  	Helpers.ajaxReq('DELETE', url, {}, function(err, result) {
+	  		console.log(err);
+	  		// console.log(result);
+	  	});
+
+
+		var modelName = reading.is_book ? 'myReadings' : 'myArticles';
+		// then remove from state
+		Helpers.removeFromState(that, modelName, 'id', reading.id);
+	};
+
+	result.getImageCover = function(data) {
+		var image_url;
+
+		// console.log(data);
+
+		if (!data.is_book) {
+			image_url = data.image_url;
+		} else {
+			if (data.cover) {
+				image_url = 'http://covers.openlibrary.org/b/id/'+data.cover+'-M.jpg';
+			}
+		}
+
+
+		return image_url;
+	};
+
+	
+
 	// console.log(Auth);
 	result.toggleLoader = function() {
 		$('.loader').toggle();
@@ -28,7 +71,7 @@ define([
 	};
 
 	result.ajaxReq = function(type, url, data, cb) {
-		var that = this;
+		// var that = this;
 
 		$.ajax({
 			type: type,
