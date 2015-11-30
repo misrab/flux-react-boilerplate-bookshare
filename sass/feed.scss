@@ -1,5 +1,6 @@
 
 .feed_item {
+	position: relative;
 	width: 100%;
 	min-height: 150px;
 	background-color: white;
@@ -26,6 +27,13 @@
 	margin-top: 15px;
 }
 
+.delete_button {
+	color: grey
+}
+.delete_button:hover {
+	color: black
+}
+
 .reading_summary {
 	position: relative;
 	text-align: center;
@@ -33,17 +41,21 @@
 	margin-right: 5px;
 	margin-top: 5px;
 	display: inline-block;
-	background-color: white;
-	border: 1px solid black;
+	//background-color: white;
+	//border: 1px solid black;
 	padding: 5px;
 	height: 200px;
 
 	overflow: hidden;
 
 	img, object {
-		max-height: 100%;
+		height: 90%; /* allowing for padding, outline etc */
 		max-width: 100%;
 		display: block;
 		margin: 5px auto;
+	}
+
+	img:hover, object:hover {
+		outline: 2px solid lightblue;
 	}
 }

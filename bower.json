@@ -27,7 +27,8 @@
     "jquery-autocomplete": "~1.1.1",
     "bootstrap-linkpreview": "*",
     "moment": "~2.10.6",
-    "jQuery.dotdotdot": "dotdotdot#~1.7.4"
+    "jQuery.dotdotdot": "dotdotdot#~1.7.4",
+    "bootbox.js": "bootbox#~4.4.0"
   },
   "resolutions": {
     "jquery": "~2.1.4"

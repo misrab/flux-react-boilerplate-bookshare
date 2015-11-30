@@ -127,15 +127,17 @@ function(
 		componentDidMount: function() {
 			var that = this;
 
-			Auth.getCurrentUser(function(err, result) {
-				if (err) return console.log('Error getting current user: ' + JSON.stringify(err));
-					
-				// console.log(result);
 
-				that.setState({
-					currentUser: result
-				});
-			});
+			Auth.getCurrentUser(that);
+			// Auth.getCurrentUser(function(err, result) {
+			// 	if (err) return console.log('Error getting current user: ' + JSON.stringify(err));
+					
+			// 	// console.log(result);
+
+			// 	that.setState({
+			// 		currentUser: result
+			// 	});
+			// });
 		},
 
 
@@ -179,6 +181,9 @@ function(
 	  		if (!result) {
 	    		return cb(new Error("Invalid username or password"), null);
 	    	}
+
+
+
 
 	    	localStorage.token = btoa(result.email + ":" + result.hash);
 	    	
@@ -238,20 +243,20 @@ function(
       	});
       },
 
-		logout: function(e) {
-			if (e) e.preventDefault();
-			console.log('logout');
+		// logout: function(e) {
+		// 	if (e) e.preventDefault();
+		// 	console.log('logout');
 
-			delete localStorage.token;
-			// TODO set state, location
+		// 	delete localStorage.token;
+		// 	// TODO set state, location
 
 
-			// console.log(data);
-			// Auth.logout();
-			// auto login for now
-			this.setState({ currentUser: null });
-			window.location.replace("/");
-		},
+		// 	// console.log(data);
+		// 	// Auth.logout();
+		// 	// auto login for now
+		// 	this.setState({ currentUser: null });
+		// 	window.location.replace("/");
+		// },
 		
 
 		render: function () {
@@ -264,7 +269,7 @@ function(
 					</div>
 
 
-					<RouteHandler currentUser={that.state.currentUser} login={that.login} logout={that.logout} signup={that.signup} />
+					<RouteHandler login={that.login} logout={that.logout} signup={that.signup} />
 
 
 					{/* Footer */}

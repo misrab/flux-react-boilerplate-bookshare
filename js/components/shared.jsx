@@ -9,17 +9,14 @@ function(
 
 
 	var FeedItem = React.createClass({
-		// componentDidMount() {
-		//       var desc = $(React.findDOMNode(this)).find('.description');
-		//       // console.log(desc.text());
-		//       desc.dotdotdot();
-		// },
-
 
 		render: function() {
 			var that = this;
 			var data = that.props.data;
 			if (!data) return null;
+
+
+			// console.log(that.props.deletePost)
 
 
 			// console.log(data);
@@ -33,13 +30,22 @@ function(
 					+ "..."; // TODO maybe Read More
 			}
 
+			// cancel button if user posted this
+			var cancel;
+			if (that.props.currentUser.id === data.user.id) {
+				cancel = <Cancel data={data} handler={that.props.deletePost} />;
+			} 
+			// {that.props.currentUser}
 
 			return (
 				<div className="feed_item">
+					{ cancel }
+
 					{/* user and meta */}
 					<div style={{backgroundColor: 'lightgrey', padding: '5px', margin: '5px 0'}}>
 						<strong>{data.user.email}</strong> { moment(data.updatedAt).calendar().toLowerCase() }
 					</div>
+
 
 					{/* reading summary */}
 					<ReadingSummary data={data.reading} />
@@ -77,6 +83,7 @@ function(
 			var data = that.props.data;
 
 
+
 			var button;
 			if (that.props.feedSeeMoreLoading) {
 				button = <center>
@@ -95,7 +102,7 @@ function(
 				<div>
 					{
 						data.map(function(v, i) {
-							return <FeedItem data={v} key={i} />;
+							return <FeedItem deletePost={that.props.deletePost} currentUser={that.props.currentUser} data={v} key={i} />;
 						})
 					}
 
@@ -162,6 +169,11 @@ function(
 
 			if (!that.props.handler) return null;
 
+			// console.log(that.props.handler);
+			// console.log(that.props.data);
+
+			// return null;
+
 			var styler = {
 				position: 'absolute',
 				top: '2px',
@@ -170,7 +182,7 @@ function(
 			};
 
 			return (
-				<span onClick={that.props.handler.bind(null, that.props.data)} style={styler} className="fa fa-times">
+				<span onClick={that.props.handler.bind(null, that.props.data)} style={styler} className="fa fa-times delete_button">
 				</span>
 			)
 		}
@@ -182,7 +194,7 @@ function(
 		Readings
 	*/
 
-
+	var TITLE_LEN_CAP = 25;
 	var ReadingSummary = React.createClass({
 		
 		render: function() {
@@ -192,12 +204,18 @@ function(
 			if (!data) return null;
 			// <Shared.Cancel data={data} handler={that.props.deleteReading} />
 
+			// clean up the title length
+			var cleanTitle = data.title;
+			if (cleanTitle.length > TITLE_LEN_CAP) cleanTitle = cleanTitle.slice(0, TITLE_LEN_CAP) + "..."
+
 			// decide on image url
 			var image_url = Helpers.getImageCover(data);
-			var title;
+			var image_style = {};
+			var title; // the react component, not title string
 			if (!image_url) {
-				title = <strong>{data.title}</strong>;
+				title = <strong>{cleanTitle}</strong>;
 				image_url = "img/logo_grey.png";
+				image_style['height'] = "50%";
 			}
 
 			// console.log(Helpers.getImageCover)
@@ -210,9 +228,11 @@ function(
 
 						<Cancel data={data} handler={that.props.deleteReading} />
 
-						<object data={image_url} type="image/png">
-							<img src="img/logo_grey.png" />
-						</object>
+						<a href={"#/app/readings/" + data.id}>
+							<object style={image_style} data={image_url} type="image/png">
+								<img src="img/logo_grey.png" />
+							</object>
+						</a>
 					</div>
 
 				</div>
@@ -226,6 +246,8 @@ function(
 	var ReadingViewer = React.createClass({
 		render: function() {
 			var that = this;
+
+			// console.log(that.props.myReadings);
 
 			return (
 				<div className="my_panel">
@@ -268,39 +290,45 @@ function(
 
 
 	result.getReadingsState = function(that) {
+		var user = that.state.currentUser;
+
 		// get user's readings
-		Auth.getCurrentUser(function(err, user) {
-			// first check user
+		Helpers.ajaxReq('GET', Config.API_URL + '/users/'+ user.id +'/readings', {}, function(err, result) {
 			if (!user || err) {
-				console.log('didnt get current user');
-				Auth.logout();
+				console.log('didnt get readings');
 				return;
 			}
-			// next get user's readings
-			Helpers.ajaxReq('GET', Config.API_URL + '/users/'+ user.id +'/readings', {}, function(err, result) {
-				if (!user || err) {
-					console.log('didnt get readings');
-					return;
-				}
 
-				// TODO split books and articles, or run 2 queries with ?is_book=
-				var splitReadings = Helpers.splitReadings(result);
+			// TODO split books and articles, or run 2 queries with ?is_book=
+			var splitReadings = Helpers.splitReadings(result);
 
 
-				that.setState({
-					myReadings: splitReadings[0], // result
-					myArticles: splitReadings[1],
-					currentUser: user
-				});
+			// console.log(splitReadings);
+
+			that.setState({
+				myReadings: splitReadings[0], // result
+				myArticles: splitReadings[1]
+				// , currentUser: user
 			});
 		});
 	};
 
 
 	result.Readings = React.createClass({
+		// deleteReading: function(reading, e) {
+		// 	var that = this;
+		// 	Helpers.deleteReading(that, reading, e);
+		// },
 		deleteReading: function(reading, e) {
+			// Helpers.deleteReading(that, reading, e);
 			var that = this;
-			Helpers.deleteReading(that, reading, e);
+			e.preventDefault();
+
+			// console.log(item); return;
+
+			var baseUrl = Config.API_URL + "/users_readings/";
+			var modelName = reading.is_book ? 'myReadings' : 'myArticles';
+			Helpers.deleteItem(that, baseUrl, reading.id, modelName);
 		},
 
 		getInitialState: function() {
@@ -313,7 +341,9 @@ function(
 
 		componentDidMount: function() {
 			var that = this;
-			result.getReadingsState(that);
+			Auth.getCurrentUser(that, function() {
+				result.getReadingsState(that);
+			});
 		},
 
 
@@ -333,7 +363,7 @@ function(
 							</a>
 
 							{/* body */}
-							<ReadingViewer deleteReading={that.deleteReading} myReadings={that.props.myReadings} myArticles={that.props.myArticles} />
+							<ReadingViewer deleteReading={that.deleteReading} myReadings={that.state.myReadings} myArticles={that.state.myArticles} />
 							
 
 						</div>

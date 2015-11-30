@@ -3,7 +3,7 @@ require.config({
 
   },
   paths: {
-    bootbox: "../bower_components/bootbox/bootbox",
+    bootbox: "../bower_components/bootbox.js/bootbox",
     bootstrap: "../bower_components/bootstrap/dist/js/bootstrap",
     jquery: "../bower_components/jquery/dist/jquery",
     "bootstrap-sass-official": "../bower_components/bootstrap-sass-official/assets/javascripts/bootstrap",

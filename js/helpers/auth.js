@@ -22,42 +22,27 @@ define([
 	  // },
 
 	  // cb(err, user)
-	  getCurrentUser: function(cb) {
-	  	var that = this;
+	  getCurrentUser: function(that, cb) {
+	  	// var that = this;
 	  	var url = Config.API_URL + "/current_user";
 
+	  	// console.log(that);
 
 	  	// console.log(atob(localStorage.token));
 
-	  	Helpers.ajaxReq('GET', url, {}, cb);
+	  	Helpers.ajaxReq('GET', url, {}, function(err, result) {
+			if (err || !result) return console.log('Error getting current user: ' + JSON.stringify(err));
+			
+			// console.log(result);
 
-
-	  // 	$.ajax({
-			//   type: "GET",
-		 //    beforeSend: function(xhr) { xhr.setRequestHeader("Authorization", "Basic " + that.getToken()); },
-			//   url: url,
-			//   contentType: 'application/json', 
-			//   success: function(result) {
-			//   	// console.log(result);
-			//   	// if (!result) {
-			//   	// 	delete localStorage.token;
-			//   	// 	if (window.location.pathname!=="/") window.location.replace('/');
-			//   	// }
-
-			//   	cb(null, result);
-			//   },
-			//   error: function(err) {
-			//   	console.log('error: ' + JSON.stringify(err));
-
-			//   	// make sure logged out
-			//   	// delete localStorage.token;
-			//   	// if (window.location.pathname!=="/") window.location.replace('/');
-
-			//   	cb(err);
-			//   }
-			// });
-
-	  // 	cb(null, null);
+			// set user
+			localStorage.token = btoa(result.email + ":" + result.hash);
+			that.setState({
+				currentUser: result
+			}, function() {
+				if (cb) cb();
+			});
+		});
 	  },
 
 

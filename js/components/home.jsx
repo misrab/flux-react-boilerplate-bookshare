@@ -175,6 +175,10 @@ function(
 		render: function() {
 			var that = this;
 
+
+			// console.log(that.props.deletePost)
+
+
 			return (
 				<div className="my_panel">
 					<div className="white_box"></div>
@@ -204,15 +208,18 @@ function(
 
 
 
-									<div id="postButton" onClick={that.props.addReading} className="btn btn-success box full_width small_space_top">
-										Post
+									<div onClick={that.props.addReading} className="btn btn-primary box half_width small_space_top">
+										Private Note
+									</div>
+									<div id="postButton" onClick={that.props.addReading} className="btn btn-success box half_width small_space_top">
+										Open Post
 									</div>
 
 								</div>
 
 							</div>
 							<div className="col-md-7">
-								<Shared.PostViewer feedSeeMoreLoading={that.props.feedSeeMoreLoading} feedSeeMore={that.props.feedSeeMore} data={that.props.posts} />
+								<Shared.PostViewer deletePost={that.props.deletePost} currentUser={that.props.currentUser} feedSeeMoreLoading={that.props.feedSeeMoreLoading} feedSeeMore={that.props.feedSeeMore} data={that.props.posts} />
 							</div>
 						</div>
 						
@@ -231,7 +238,25 @@ function(
 
 	result.Home = React.createClass({
 		deleteReading: function(reading, e) {
-			Helpers.deleteReading(that, reading, e);
+			// Helpers.deleteReading(that, reading, e);
+			var that = this;
+			e.preventDefault();
+
+			// console.log(item); return;
+
+			var baseUrl = Config.API_URL + "/users_readings/";
+			var modelName = reading.is_book ? 'myReadings' : 'myArticles';
+			Helpers.deleteItem(that, baseUrl, reading.id, modelName);
+		},
+
+		deletePost: function(item, e) {
+			var that = this;
+			e.preventDefault();
+
+			// console.log(item); return;
+
+			var baseUrl = Config.API_URL + "/posts/";
+			Helpers.deleteItem(that, baseUrl, item.id, 'posts');
 		},
 
 		selectBook: function(e, ui) {
@@ -529,6 +554,8 @@ function(
 			});
 		},
 
+
+
 		
 
 		/*
@@ -538,7 +565,7 @@ function(
 
 		getInitialState: function() {
 		    return {
-		    		// currentUser: null,
+	    		currentUser: null,
 		        suggestions: [{id: 23, title:'aaaaa', image_url: 'imgggg'}],
 		        myReadings: [], // books
 		        myArticles: [],
@@ -556,22 +583,33 @@ function(
 		componentDidMount: function() {
 			var that = this;
 
-			console.log(that.props.currentUser);
+			// console.log(that.props.currentUser);
+			Auth.getCurrentUser(that, function() {
+				Shared.getReadingsState(that);
+			});
 
 			// get posts i.e. feed
 			Helpers.ajaxReq('GET', Config.API_URL + '/feed/posts', {}, function(err, result) {
+				if (err) {
+					return console.log('error getting posts: ' + JSON.stringify(err));
+				}
+				// console.log(result);
+
 				that.setState({ posts: result });
 			});
 
-
-			Shared.getReadingsState(that);
 			
 		},
+
+
+
+
 
 
 		render: function() {
 			var that = this;
 
+			// console.log(that.deletePost)
 
 			
 			return (
@@ -587,7 +625,7 @@ function(
 							</a>
 
 							{/* body */}
-							<Feed feedSeeMoreLoading={that.state.feedSeeMoreLoading} feedSeeMore={that.feedSeeMore} previewReading={that.state.previewReading} posts={that.state.posts} getBookSuggestions={that.getBookSuggestions} addReading={that.addReading} selectBook={that.selectBook} handleLink={that.handleLink}  />
+							<Feed deletePost={that.deletePost} currentUser={that.state.currentUser} feedSeeMoreLoading={that.state.feedSeeMoreLoading} feedSeeMore={that.feedSeeMore} previewReading={that.state.previewReading} posts={that.state.posts} getBookSuggestions={that.getBookSuggestions} addReading={that.addReading} selectBook={that.selectBook} handleLink={that.handleLink}  />
 
 
 							<Shared.ReadingViewer deleteReading={that.deleteReading} myReadings={that.state.myReadings} myArticles={that.state.myArticles} />
