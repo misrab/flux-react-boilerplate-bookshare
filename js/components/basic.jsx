@@ -501,6 +501,7 @@ function(
 
 							
 							<div className="pull-right big_space_top">
+								{/*
 								<Facebook
 									appId="912474842172888"
 									class="facebook-login"
@@ -509,7 +510,7 @@ function(
 									
 								<a href="#/app/home" className="btn btn-default box">
 									Home (temp)
-								</a>
+								</a>*/}
 
 								<a href="#/login" className="btn btn-default box">
 									Login / Signup
