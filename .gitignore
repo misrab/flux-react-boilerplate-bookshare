@@ -13,6 +13,7 @@
 dist/*.js
 dist/*.css
 
+!server.js
 
 
 .tmp
