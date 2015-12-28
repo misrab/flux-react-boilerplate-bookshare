@@ -321,12 +321,12 @@ function(
 
 			function postReading(that, reading) {
 				// post association
-		  	var url = Config.API_URL + "/users_readings";
-		  	var data = { reading_id: reading.id || 0 };
-		  	Helpers.ajaxReq('POST', url, data, function(err, result) {
-		  		if (err) console.log(err); // user could already be associated
-		  		// console.log(result);
-		  	});
+			  	var url = Config.API_URL + "/users_readings";
+			  	var data = { reading_id: reading.id || 0 };
+			  	Helpers.ajaxReq('POST', url, data, function(err, result) {
+			  		if (err) console.log(err); // user could already be associated
+			  		// console.log(result);
+			  	});
 
 
 				// add post to feed
@@ -374,7 +374,7 @@ function(
 
 
 
-				// TODO clear the inputs on success
+				// clear the inputs on success
 				// also clear the previewReading
 				that.setState({
 					previewReading: null
@@ -382,11 +382,14 @@ function(
 				$('#new_post_panel').find('input').val('');
 				$('#new_post_panel').find('textarea').val('');
 
-			};
+			}; // end of func postReading
 
 			
 			var reading = that.state.previewReading;
 
+
+
+			console.log(reading);
 
 			// if there's no id assume it's an article
 			// (TODO if we allow them to add a book not included, this 
@@ -409,68 +412,6 @@ function(
 
 			}
 
-
-			// TEMP
-			return;
-
-
-			// post association
-			// var that = this;
-		 //  	var url = Config.API_URL + "/users_readings";
-		 //  	var data = { reading_id: reading.id || 0 };
-		 //  	Helpers.ajaxReq('POST', url, data, function(err, result) {
-		 //  		console.log(err); // user could already be associated
-		 //  		// console.log(result);
-		 //  	});
-		 //  	// return;
-
-
-			// // add post to feed
-			// // get description
-			// // this is for the browser side
-			// var comment = $('#post_description').val() || "Was just reading";
-			// var post = {};
-			// post.comment = comment;
-			// post.reading = reading;
-			// post.user = that.state.currentUser;
-			// that.setState({
-			// 	posts: that.state.posts.concat([post])
-			// });
-
-			// // post actual post server side
-			// var postData = {};
-			// postData.comment = comment;
-			// postData.user_id = that.state.currentUser.id;
-			// postData.reading_id = reading.id;
-			// console.log('posting post: ' + JSON.stringify(postData));
-			// Helpers.ajaxReq('POST', Config.API_URL + "/posts", postData, function(err, result) {
-		 //  		console.log(err); // user could already be associated
-		 //  		console.log(result);
-		 //  	});
-
-
-			// // only add if not in readings
-			// var found = false;
-			// for (var i=0; i < that.state.myReadings.length; i++) {
-			// 	if (reading.id === that.state.myReadings[i].id) {
-			// 		found = true;
-			// 		break;
-			// 	}
-			// }
-			// if (!found) {
-			// 	that.setState({
-			// 		myReadings: that.state.myReadings.concat([reading])
-			// 	});
-			// }
-
-
-			// // TODO clear the inputs on success
-			// // also clear the previewReading
-			// that.setState({
-			// 	previewReading: null
-			// });
-			// $('#new_post_panel').find('input').val('');
-			// $('#new_post_panel').find('textarea').val('');
 		},
 
 

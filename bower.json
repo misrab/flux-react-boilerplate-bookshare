@@ -15,7 +15,7 @@
   ],
   "dependencies": {
     "bootbox": "~4.4.0",
-    "bootstrap": "~3.3.4",
+    "bootstrap": "~3.3.6",
     "bootstrap-sass-official": "~3.3.4",
     "fontawesome": "~4.3.0",
     "jquery": "~2.1.4",

@@ -363,6 +363,10 @@ function(
 	});
 
 	result.SidebarView = React.createClass({
+
+		  logout: Auth.logout,
+
+
 		  toggleMenu: function(e) {
 	          e.preventDefault();
 	          $('#sidebar-wrapper').toggleClass('active');
@@ -442,7 +446,7 @@ function(
 
 
 	                <li>
-	                  <a href="#" className="sidebar_item" onClick={that.props.logout}>
+	                  <a href="#" className="sidebar_item" onClick={that.logout}>
 	                    Logout
 	                  </a>
 	                </li>
