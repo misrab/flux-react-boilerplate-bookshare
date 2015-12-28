@@ -212,10 +212,10 @@ function(
 										// has been found
 										that.props.previewReading ? (
 											<div>
-												<div onClick={that.props.addReading} className="btn btn-primary box half_width small_space_top">
+												<div onClick={that.props.addReading.bind(null, true)} className="btn btn-primary box half_width small_space_top">
 													Private Note
 												</div>
-												<div id="postButton" onClick={that.props.addReading} className="btn btn-success box half_width small_space_top">
+												<div id="postButton" onClick={that.props.addReading.bind(null, false)} className="btn btn-success box half_width small_space_top">
 													Open Post
 												</div>
 											</div>
@@ -258,15 +258,15 @@ function(
 			Helpers.deleteItem(that, baseUrl, reading.id, modelName);
 		},
 
-		deletePost: function(item, e) {
-			var that = this;
-			e.preventDefault();
+		// deletePost: function(item, e) {
+		// 	var that = this;
+		// 	e.preventDefault();
 
-			// console.log(item); return;
+		// 	// console.log(item); return;
 
-			var baseUrl = Config.API_URL + "/posts/";
-			Helpers.deleteItem(that, baseUrl, item.id, 'posts');
-		},
+		// 	var baseUrl = Config.API_URL + "/posts/";
+		// 	Helpers.deleteItem(that, baseUrl, item.id, 'posts');
+		// },
 
 		selectBook: function(e, ui) {
 			var that = this;
@@ -310,13 +310,10 @@ function(
 
 
 		// this is actually when they post a post to their feed
-		addReading: function(e) {
+		addReading: function(privateBool, e) {
 			var that = this;
 
 			e.preventDefault();
-			// var item = ui.item;
-
-			// var el = $(e.target);
 
 
 			function postReading(that, reading) {
@@ -346,6 +343,7 @@ function(
 				postData.comment = comment;
 				postData.user_id = that.state.currentUser.id;
 				postData.reading_id = reading.id;
+				postData['private'] = privateBool;
 				// console.log('posting post: ' + JSON.stringify(postData));
 				Helpers.ajaxReq('POST', Config.API_URL + "/posts", postData, function(err, result) {
 			  		console.log(err); // user could already be associated
@@ -504,6 +502,16 @@ function(
 			});
 		},
 
+
+		deletePost: function(item, e) {
+			var that = this;
+			e.preventDefault();
+
+			// console.log(item); return;
+
+			var baseUrl = Config.API_URL + "/posts/";
+			Helpers.deleteItem(that, baseUrl, item.id, 'posts');
+		},
 
 
 		

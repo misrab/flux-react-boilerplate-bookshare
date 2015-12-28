@@ -144,7 +144,7 @@ function(
 		}	
 	};
 
-	
+
 
 
 	result.showAlert = function(msg, type) {

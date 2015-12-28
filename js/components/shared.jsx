@@ -30,7 +30,21 @@ function(
 					+ "..."; // TODO maybe Read More
 			}
 
+
+
+			// if the post if private
+			var styler = {};
+			var priv;
+			if (data['private']) {
+				styler['backgroundColor'] = 'lightblue';
+				priv = <span style={{color:'grey', fontStyle:'italic'}} className="pull-right">Private</span>
+			}
+			
+
+
+
 			// console.log(that.props.currentUser);
+			// console.log(data.user);
 			// console.log(data.user)
 			// console.log(that.props.currentUser && (that.props.currentUser.id === data.user.id))
 
@@ -39,15 +53,16 @@ function(
 			if (that.props.currentUser && (that.props.currentUser.id === data.user.id)) {
 				cancel = <Cancel data={data} handler={that.props.deletePost} />;
 			} 
-			// {that.props.currentUser}
 
 			return (
-				<div className="feed_item">
+				<div className="feed_item" style={styler}>
 					{ cancel }
 
 					{/* user and meta */}
 					<div style={{backgroundColor: 'lightgrey', padding: '5px', margin: '5px 0'}}>
 						<strong>{data.user.email}</strong> { moment(data.updatedAt).calendar().toLowerCase() }
+					
+						{ priv }
 					</div>
 
 

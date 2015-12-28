@@ -15,6 +15,20 @@ function(
 
 	result.ReadingZoom = React.createClass({
 
+		// also in home.jsx
+		deletePost: function(item, e) {
+			var that = this;
+			e.preventDefault();
+
+			// console.log(item); return;
+
+			var baseUrl = Config.API_URL + "/posts/";
+			Helpers.deleteItem(that, baseUrl, item.id, 'posts');
+		},
+
+
+
+
 
 		getInitialState: function() {
 		    return {
@@ -26,6 +40,8 @@ function(
 
 
 		componentDidMount: function() {
+			// return;
+
 			var that = this;
 			Auth.getCurrentUser(that, function(err, user) {
 				// get user_id's posts for this reading_id
@@ -37,6 +53,8 @@ function(
 
 				// TODO offset when many...
 				Helpers.ajaxReq('GET', Config.API_URL + '/posts?user_id='+user.id+'&reading_id='+that.props.params.id, {}, function(err, result) {
+					// console.log(result);
+
 					// that.setState({ feedSeeMoreLoading: false });
 					if (!result || !result.length) return;
 
@@ -113,7 +131,7 @@ function(
 									<div className="row">
 										<div className="col-md-3">
 									
-											<object data={image_url} type="image/png">
+											<object style={{'width': '100%'}} data={image_url} type="image/png">
 												<img src="img/logo_grey.png" />
 											</object>
 
@@ -130,7 +148,7 @@ function(
 
 
 											{/* existing posts */}
-											<Shared.PostViewer deletePost={null} currentUser={that.state.currentUser} data={that.state.posts} />
+											<Shared.PostViewer deletePost={that.deletePost} currentUser={that.state.currentUser} data={that.state.posts} />
 
 										</div>
 									</div>
