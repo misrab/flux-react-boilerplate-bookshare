@@ -387,7 +387,7 @@ function(
 
 
 
-			console.log(reading);
+			// console.log(reading);
 
 			// if there's no id assume it's an article
 			// (TODO if we allow them to add a book not included, this 
